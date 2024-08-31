@@ -14,7 +14,9 @@ export function setToken(token: string, expiresIn: number): void {
 }
 
 export function isTokenValid(token: string): boolean {
-  return token === tokenStore.accessToken && Date.now() < (tokenStore.expiresAt ?? 0);
+  return (
+    token === tokenStore.accessToken && Date.now() < (tokenStore.expiresAt ?? 0)
+  );
 }
 
 export function clearToken(): void {
