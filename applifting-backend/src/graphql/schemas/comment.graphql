@@ -1,0 +1,36 @@
+type Comment {
+  commentId: ID!
+  author: String!
+  content: String!
+  postedAt: DateTime!
+  score: Int!
+  article: Article!
+}
+
+input CreateCommentInput {
+  articleId: ID!
+  author: String!
+  content: String!
+}
+
+input VoteCommentInput {
+  commentId: ID!
+  vote: VoteType!
+}
+
+enum VoteType {
+  UP
+  DOWN
+}
+
+type Mutation {
+  createComment(input: CreateCommentInput!): Comment!
+  voteComment(input: VoteCommentInput!): Comment!
+}
+
+type Subscription {
+  commentAdded(articleId: ID!): Comment!
+  commentVoted(commentId: ID!): Comment!
+}
+
+scalar DateTime

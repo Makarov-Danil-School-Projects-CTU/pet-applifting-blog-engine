@@ -1,0 +1,36 @@
+type Article {
+  articleId: ID!
+  title: String!
+  perex: String!
+  content: String!
+  createdAt: DateTime!
+  lastUpdatedAt: DateTime!
+  tenant: Tenant!
+  comments: [Comment!]!
+}
+
+input CreateArticleInput {
+  title: String!
+  perex: String!
+  content: String!
+  tenantId: ID!
+}
+
+input UpdateArticleInput {
+  title: String
+  perex: String
+  content: String
+}
+
+type Query {
+  getArticles: [Article!]
+  getArticle(articleId: ID!): Article
+}
+
+type Mutation {
+  createArticle(input: CreateArticleInput!): Article!
+  updateArticle(articleId: ID!, input: UpdateArticleInput!): Article
+  deleteArticle(articleId: ID!): Article
+}
+
+scalar DateTime

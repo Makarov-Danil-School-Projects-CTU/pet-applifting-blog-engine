@@ -1,0 +1,23 @@
+type Tenant {
+  tenantId: ID!
+  apiKey: String!
+  name: String!
+  createdAt: DateTime!
+  lastUsedAt: DateTime
+  articles: [Article!]!
+}
+
+input CreateTenantInput {
+  name: String!
+  password: String!
+}
+
+type Query {
+  getTenant(tenantId: ID!): Tenant
+}
+
+type Mutation {
+  createTenant(input: CreateTenantInput!): Tenant
+}
+
+scalar DateTime
