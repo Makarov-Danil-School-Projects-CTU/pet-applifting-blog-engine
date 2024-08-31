@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 
 import { Tenant } from 'src/entities/tenant.entity';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
@@ -7,6 +15,7 @@ import { TenantResponseDto } from './dtos/tenant-response.dto';
 import { TenantService } from './tenant.service';
 
 @Controller('tenants')
+@UsePipes(new ValidationPipe({ whitelist: true }))
 @Serialize(TenantResponseDto)
 export class TenantController {
   constructor(private tenantServise: TenantService) {}

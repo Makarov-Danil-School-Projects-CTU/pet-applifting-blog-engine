@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
-
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { promisify } from 'util';
+
+import { Article } from 'src/entities/article.entity';
 import { Tenant } from '../entities/tenant.entity';
 import { CreateTenantDto } from './dtos/create-tenant.dto';
 
@@ -24,7 +25,10 @@ interface ExternalApiTenantResponse {
 
 @Injectable()
 export class TenantService {
-  constructor(@InjectRepository(Tenant) private tenantRepository) {}
+  constructor(
+    @InjectRepository(Tenant) private tenantRepository,
+    @InjectRepository(Article) private articleRepository,
+  ) {}
 
   private tenantApiUrl = 'https://fullstack.exercise.applifting.cz/tenants';
 
@@ -62,6 +66,7 @@ export class TenantService {
         password: result,
         createdAt: new Date(tenantData.createdAt),
         lastUsedAt: null,
+        articles: [],
       });
 
       return this.tenantRepository.save(tenant);
@@ -78,6 +83,9 @@ export class TenantService {
       return null;
     }
 
-    return this.tenantRepository.findOne({ where: { tenantId } });
+    return this.tenantRepository.findOne({
+      where: { tenantId },
+      relations: ['articles'],
+    });
   }
 }
