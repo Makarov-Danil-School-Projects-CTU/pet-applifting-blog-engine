@@ -1,18 +1,39 @@
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module, ValidationPipe } from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
 import { ArticleModule } from './article/article.module';
-import { TenantModule } from './tenant/tenant.module';
+import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { ImageModule } from './image/image.module';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(typeOrmConfig),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      playground: false,
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      context: ({ req }) => ({ req }),
+      typePaths: ['./**/*.graphql'],
+      definitions: {
+        path: join(process.cwd(), 'src/graphql/graphql.ts'),
+        outputAs: 'class',
+      },
+      subscriptions: {
+        'graphql-ws': {
+          path: '/graphql',
+        },
+      },
+    }),
     AuthModule,
     TenantModule,
     ArticleModule,
@@ -20,15 +41,6 @@ import { ImageModule } from './image/image.module';
     ImageModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    // Validation pipe checks all imcoming DTOs
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true,
-      }),
-    },
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

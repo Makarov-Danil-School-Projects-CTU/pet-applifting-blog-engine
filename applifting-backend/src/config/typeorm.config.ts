@@ -10,5 +10,4 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   database: process.env.DATABASE_NAME || 'applifting',
   entities: [join(__dirname, '/../**/*.entity.{js,ts}')],
   synchronize: true,
-  dropSchema: true,
 };
