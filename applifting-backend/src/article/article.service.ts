@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Article } from 'src/entities/article.entity';
+import { Tenant } from 'src/entities/tenant.entity';
 import { Repository } from 'typeorm';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateArticleDto } from './dtos/update-article.dto';
@@ -11,19 +12,39 @@ export class ArticleService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
+
+    @InjectRepository(Tenant)
+    private tenantRepository: Repository<Tenant>,
   ) {}
 
   async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
-    const article = this.articleRepository.create(createArticleDto);
+    const { tenantId, ...articleData } = createArticleDto;
+    const tenant = await this.tenantRepository.findOne({ where: { tenantId } });
+
+    if (!tenant) {
+      throw new Error('Tenant not found');
+    }
+
+    const article = this.articleRepository.create({
+      ...articleData,
+      tenant,
+      comments: [],
+    });
+
     return await this.articleRepository.save(article);
   }
 
   async getAllArticles(): Promise<Article[]> {
-    return await this.articleRepository.find();
+    return await this.articleRepository.find({
+      relations: ['tenant', 'comments'],
+    });
   }
 
   async getArticleById(articleId: string): Promise<Article> {
-    return await this.articleRepository.findOne({ where: { articleId } });
+    return await this.articleRepository.findOne({
+      where: { articleId },
+      relations: ['tenant', 'comments'],
+    });
   }
 
   async updateArticle(

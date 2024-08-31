@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateArticleDto {
   @IsString()
@@ -16,8 +16,4 @@ export class UpdateArticleDto {
   @IsString()
   @IsOptional()
   author?: string;
-
-  @IsUUID()
-  @IsOptional()
-  imageId?: string;
 }

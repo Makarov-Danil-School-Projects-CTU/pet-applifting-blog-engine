@@ -13,11 +13,7 @@ export class CreateArticleDto {
   @IsNotEmpty()
   content: string;
 
-  @IsString()
-  @IsNotEmpty()
-  author: string;
-
   @IsUUID()
   @IsOptional()
-  imageId?: string;
+  tenantId: string;
 }
