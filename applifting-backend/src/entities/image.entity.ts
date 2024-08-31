@@ -1,6 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-
-import { Article } from './article.entity';
+import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
+  Column,
+  Entity,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity('images')
 export class Image {
@@ -16,6 +21,18 @@ export class Image {
   @Column()
   url: string; // URL to access the image
 
-  @ManyToOne(() => Article, (article) => article.image, { onDelete: 'CASCADE' })
-  article: Article;
+  @AfterInsert()
+  logInsert() {
+    console.log('Inserted Image with id', this.imageId);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updated Image with id', this.imageId);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removed Image with id', this.imageId);
+  }
 }

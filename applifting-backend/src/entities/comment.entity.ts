@@ -1,4 +1,7 @@
 import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -36,4 +39,19 @@ export class Comment {
 
   @OneToMany(() => CommentVote, (vote) => vote.comment)
   votes: CommentVote[];
+
+  @AfterInsert()
+  logInsert() {
+    console.log('Inserted Comment with id', this.commentId);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updated Comment with id', this.commentId);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removed Comment with id', this.commentId);
+  }
 }

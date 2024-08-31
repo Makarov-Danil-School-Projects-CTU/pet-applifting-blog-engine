@@ -37,16 +37,16 @@ export class Tenant {
 
   @AfterInsert()
   logInsert() {
-    console.log('Inserted User with id', this.tenantId);
+    console.log('Inserted Tenant with id', this.tenantId);
   }
 
   @AfterUpdate()
   logUpdate() {
-    console.log('Updated User with id', this.tenantId);
+    console.log('Updated Tenant with id', this.tenantId);
   }
 
   @AfterRemove()
   logRemove() {
-    console.log('Removed User with id', this.tenantId);
+    console.log('Removed Tenant with id', this.tenantId);
   }
 }

@@ -1,4 +1,7 @@
 import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,7 +13,6 @@ import {
 } from 'typeorm';
 
 import { Comment } from './comment.entity';
-import { Image } from './image.entity';
 import { Tenant } from './tenant.entity';
 
 @Entity('articles')
@@ -24,24 +26,37 @@ export class Article {
   @Column()
   perex: string;
 
+  @Column()
+  content: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   lastUpdatedAt: Date;
 
-  @OneToMany(() => Image, (imageInfo) => imageInfo.article, {
-    cascade: true,
-    onDelete: 'CASCADE',
-    nullable: true,
-  })
-  @JoinColumn({ name: 'image_id' })
-  image: Image;
-
   @ManyToOne(() => Tenant, (tenant) => tenant.articles, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'tenant_id' })
   tenant: Tenant;
 
-  @OneToMany(() => Comment, (comment) => comment.article, { nullable: true })
+  @OneToMany(() => Comment, (comment) => comment.article, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   comments: Comment[];
+
+  @AfterInsert()
+  logInsert() {
+    console.log('Inserted Article with id', this.articleId);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updated Article with id', this.articleId);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removed Article with id', this.articleId);
+  }
 }
