@@ -6,6 +6,6 @@ export class VoteDto {
   commentId: string;
 
   @IsString()
-  @IsIn(['up', 'down'])
-  vote: 'up' | 'down';
+  @IsIn(['UP', 'DOWN'])
+  vote: 'UP' | 'DOWN';
 }

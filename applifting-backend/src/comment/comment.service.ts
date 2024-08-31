@@ -40,6 +40,7 @@ export class CommentService {
       author,
       content,
       article,
+      votes: [],
     });
 
     return this.commentRepository.save(comment);
@@ -63,7 +64,7 @@ export class CommentService {
         ipAddress,
       },
     });
-    const voteValue = voteDto.vote === 'up' ? 1 : -1;
+    const voteValue = voteDto.vote === 'UP' ? 1 : -1;
 
     if (existingVote) {
       // If the vote value is different, update it
@@ -79,7 +80,7 @@ export class CommentService {
       // If there is no existing vote, create a new vote
       const vote = this.commentVoteRepository.create({
         ipAddress,
-        value: voteDto.vote === 'up' ? 1 : -1,
+        value: voteDto.vote === 'UP' ? 1 : -1,
         comment,
       });
 
