@@ -26,18 +26,18 @@ export class CommentVote {
   @JoinColumn({ name: 'comment_id' })
   comment: Comment;
 
-  @AfterInsert()
-  logInsert() {
-    console.log('Inserted CommentVote with id', this.voteId);
-  }
+  // @AfterInsert()
+  // logInsert() {
+  //   console.log('Inserted CommentVote with id', this.voteId);
+  // }
 
-  @AfterUpdate()
-  logUpdate() {
-    console.log('Updated CommentVote with id', this.voteId);
-  }
+  // @AfterUpdate()
+  // logUpdate() {
+  //   console.log('Updated CommentVote with id', this.voteId);
+  // }
 
-  @AfterRemove()
-  logRemove() {
-    console.log('Removed CommentVote with id', this.voteId);
-  }
+  // @AfterRemove()
+  // logRemove() {
+  //   console.log('Removed CommentVote with id', this.voteId);
+  // }
 }

@@ -37,21 +37,23 @@ export class Comment {
   @JoinColumn({ name: 'article_id' })
   article: Article;
 
-  @OneToMany(() => CommentVote, (vote) => vote.comment)
+  @OneToMany(() => CommentVote, (vote) => vote.comment, {
+    cascade: true,
+  })
   votes: CommentVote[];
 
-  @AfterInsert()
-  logInsert() {
-    console.log('Inserted Comment with id', this.commentId);
-  }
+  // @AfterInsert()
+  // logInsert() {
+  //   console.log('Inserted Comment with id', this.commentId);
+  // }
 
-  @AfterUpdate()
-  logUpdate() {
-    console.log('Updated Comment with id', this.commentId);
-  }
+  // @AfterUpdate()
+  // logUpdate() {
+  //   console.log('Updated Comment with id', this.commentId);
+  // }
 
-  @AfterRemove()
-  logRemove() {
-    console.log('Removed Comment with id', this.commentId);
-  }
+  // @AfterRemove()
+  // logRemove() {
+  //   console.log('Removed Comment with id', this.commentId);
+  // }
 }
