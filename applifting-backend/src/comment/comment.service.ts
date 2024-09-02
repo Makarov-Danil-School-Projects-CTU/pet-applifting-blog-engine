@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
 
-import { Article } from 'src/entities/article.entity';
-import { CommentVote } from 'src/entities/comment-vote.entity';
-import { Comment } from 'src/entities/comment.entity';
+import { Article } from '../entities/article.entity';
+import { CommentVote } from '../entities/comment-vote.entity';
+import { Comment } from '../entities/comment.entity';
 import { CommentResponseDto } from './dtos/comment-response.dto';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 import { VoteDto } from './dtos/vote.dto';
@@ -128,6 +128,7 @@ export class CommentService {
     if (!comment) {
       throw new NotFoundException(`Comment with ID ${commentId} not found`);
     }
+    
     return comment;
   }
 
