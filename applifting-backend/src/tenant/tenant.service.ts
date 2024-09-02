@@ -9,7 +9,7 @@ import axios from 'axios';
 import { scrypt as _scrypt, randomBytes } from 'crypto';
 import { promisify } from 'util';
 
-import { Article } from 'src/entities/article.entity';
+import { Article } from '../entities/article.entity';
 import { Tenant } from '../entities/tenant.entity';
 import { CreateTenantDto } from './dtos/create-tenant.dto';
 
@@ -26,8 +26,7 @@ interface ExternalApiTenantResponse {
 @Injectable()
 export class TenantService {
   constructor(
-    @InjectRepository(Tenant) private tenantRepository,
-    @InjectRepository(Article) private articleRepository,
+    @InjectRepository(Tenant) private tenantRepository
   ) {}
 
   private tenantApiUrl = 'https://fullstack.exercise.applifting.cz/tenants';
@@ -78,7 +77,7 @@ export class TenantService {
     }
   }
 
-  findOne(tenantId: string): Promise<Tenant> {
+  findOne(tenantId: string): Promise<Tenant> | null{
     if (!tenantId) {
       return null;
     }
@@ -87,5 +86,13 @@ export class TenantService {
       where: { tenantId },
       relations: ['articles'],
     });
+  }
+
+  async findArticlesByTenantId(tenantId: string): Promise<Article[]> {
+    const tenant = await this.tenantRepository.findOne({
+      where: { tenantId },
+      relations: ['articles'],
+    });
+    return tenant ? tenant.articles : []; // Ensure an empty array if no articles are found
   }
 }
