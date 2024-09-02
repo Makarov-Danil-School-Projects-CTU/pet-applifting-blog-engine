@@ -7,31 +7,92 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 
+import { Serialize } from '../interceptors/serialize.interceptor';
+import { Article } from '../entities/article.entity';
 import { ArticleService } from './article.service';
+import { ArticleResponseDto } from './dtos/article-response.dto';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateArticleDto } from './dtos/update-article.dto';
 
+@ApiTags('Articles')
+@ApiSecurity('ApiKeyAuth')
+@ApiSecurity('UUIDAuth')
 @Controller('articles')
+@Serialize(ArticleResponseDto)
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Retrieve all articles' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all articles',
+    type: [Article],
+  })
   getAllArticles() {
     return this.articleService.getAllArticles();
   }
 
   @Get(':articleId')
+  @ApiOperation({ summary: 'Retrieve an article by ID' })
+  @ApiParam({
+    name: 'articleId',
+    type: String,
+    description: 'The ID of the article to retrieve',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The article with the specified ID',
+    type: Article,
+  })
+  @ApiResponse({ status: 404, description: 'Article not found.' })
   getArticleById(@Param('articleId') articleId: string) {
     return this.articleService.getArticleById(articleId);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new article' })
+  @ApiBody({
+    type: CreateArticleDto,
+    description: 'Data required to create a new article',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The article has been successfully created.',
+    type: Article,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
   createArticle(@Body() createArticleDto: CreateArticleDto) {
     return this.articleService.createArticle(createArticleDto);
   }
 
   @Patch(':articleId')
+  @ApiOperation({ summary: 'Update an existing article' })
+  @ApiParam({
+    name: 'articleId',
+    type: String,
+    description: 'The ID of the article to update',
+  })
+  @ApiBody({
+    type: UpdateArticleDto,
+    description: 'Data required to update the article',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The article has been successfully updated.',
+    type: Article,
+  })
+  @ApiResponse({ status: 404, description: 'Article not found.' })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
   updateArticle(
     @Param('articleId') articleId: string,
     @Body() updateArticleDto: UpdateArticleDto,
@@ -40,6 +101,18 @@ export class ArticleController {
   }
 
   @Delete(':articleId')
+  @ApiOperation({ summary: 'Delete an article by ID' })
+  @ApiParam({
+    name: 'articleId',
+    type: String,
+    description: 'The ID of the article to delete',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The article has been successfully deleted.',
+    type: Article,
+  })
+  @ApiResponse({ status: 404, description: 'Article not found.' })
   deleteArticle(@Param('articleId') articleId: string) {
     return this.articleService.deleteArticle(articleId);
   }
