@@ -4,7 +4,7 @@ type Tenant {
   name: String!
   createdAt: DateTime!
   lastUsedAt: DateTime
-  articles: [Article!]!
+  articles: [Article] # Non-nullable list of non-null Articles since a Tenant is expected to have zero or more articles
 }
 
 input CreateTenantInput {

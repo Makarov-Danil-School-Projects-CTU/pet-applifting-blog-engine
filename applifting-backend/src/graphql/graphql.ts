@@ -42,6 +42,12 @@ export class VoteCommentInput {
     vote: VoteType;
 }
 
+export class UploadImageInput {
+    articleId: string;
+    name: string;
+    mimeType: string;
+}
+
 export class CreateTenantInput {
     name: string;
     password: string;
@@ -53,15 +59,18 @@ export class Article {
     perex: string;
     content: string;
     createdAt: DateTime;
-    lastUpdatedAt: DateTime;
-    tenant: Tenant;
-    comments: Comment[];
+    lastUpdatedAt?: Nullable<DateTime>;
+    tenant?: Nullable<Tenant>;
+    comments?: Nullable<Nullable<Comment>[]>;
+    image?: Nullable<Image>;
 }
 
 export abstract class IQuery {
     abstract getArticles(): Nullable<Article[]> | Promise<Nullable<Article[]>>;
 
     abstract getArticle(articleId: string): Nullable<Article> | Promise<Nullable<Article>>;
+
+    abstract getImage(imageId: string): Nullable<Image> | Promise<Nullable<Image>>;
 
     abstract getTenant(tenantId: string): Nullable<Tenant> | Promise<Nullable<Tenant>>;
 }
@@ -79,6 +88,10 @@ export abstract class IMutation {
 
     abstract voteComment(input: VoteCommentInput): Comment | Promise<Comment>;
 
+    abstract uploadImage(input: UploadImageInput): Image | Promise<Image>;
+
+    abstract deleteImage(imageId: string): boolean | Promise<boolean>;
+
     abstract createTenant(input: CreateTenantInput): Nullable<Tenant> | Promise<Nullable<Tenant>>;
 }
 
@@ -94,7 +107,7 @@ export class Comment {
     content: string;
     postedAt: DateTime;
     score: number;
-    article: Article;
+    article?: Nullable<Article>;
 }
 
 export abstract class ISubscription {
@@ -103,13 +116,21 @@ export abstract class ISubscription {
     abstract commentVoted(commentId: string): Comment | Promise<Comment>;
 }
 
+export class Image {
+    imageId: string;
+    name: string;
+    url: string;
+    mimeType: string;
+    article?: Nullable<Article>;
+}
+
 export class Tenant {
     tenantId: string;
     apiKey: string;
     name: string;
     createdAt: DateTime;
     lastUsedAt?: Nullable<DateTime>;
-    articles: Article[];
+    articles?: Nullable<Nullable<Article>[]>;
 }
 
 export type DateTime = any;

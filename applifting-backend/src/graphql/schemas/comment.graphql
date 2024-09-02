@@ -4,18 +4,18 @@ type Comment {
   content: String!
   postedAt: DateTime!
   score: Int!
-  article: Article!
+  article: Article # Non-nullable because every Comment must be associated with an Article
 }
 
 input CreateCommentInput {
-  articleId: ID!
-  author: String!
-  content: String!
+  articleId: ID! # Non-nullable because a Comment must be associated with an Article
+  author: String! # Non-nullable because a Comment must have an author
+  content: String! # Non-nullable because a Comment must have content
 }
 
 input VoteCommentInput {
-  commentId: ID!
-  vote: VoteType!
+  commentId: ID! # Non-nullable because a vote must be associated with a Comment
+  vote: VoteType! # Non-nullable because the type of vote (up/down) must be specified
 }
 
 enum VoteType {

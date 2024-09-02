@@ -4,22 +4,23 @@ type Article {
   perex: String!
   content: String!
   createdAt: DateTime!
-  lastUpdatedAt: DateTime!
-  tenant: Tenant!
-  comments: [Comment!]!
+  lastUpdatedAt: DateTime
+  tenant: Tenant # Tenant is non-nullable since every Article must have a Tenant
+  comments: [Comment] # Non-nullable list of non-null comments
+  image: Image # Nullable because an Article can exist without an Image (if the image is deleted and the field is set to null)
 }
 
 input CreateArticleInput {
   title: String!
   perex: String!
   content: String!
-  tenantId: ID!
+  tenantId: ID! # Non-nullable because an Article must be associated with a Tenant
 }
 
 input UpdateArticleInput {
-  title: String
-  perex: String
-  content: String
+  title: String # Nullable because updating title is optional
+  perex: String # Nullable because updating perex is optional
+  content: String # Nullable because updating content is optional
 }
 
 type Query {

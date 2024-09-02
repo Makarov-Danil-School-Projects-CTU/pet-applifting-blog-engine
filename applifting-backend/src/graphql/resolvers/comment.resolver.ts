@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Context,
@@ -9,12 +10,16 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { CommentService } from 'src/comment/comment.service';
 import { Comment } from 'src/entities/comment.entity';
+import { AccessTokenGuard } from 'src/guards/access-token.guard';
+import { ApiKeyGuard } from 'src/guards/api-key.guard';
 import { CreateCommentInput } from '../inputs/create-comment.input';
 import { VoteCommentInput } from '../inputs/vote-comment.input';
 
 const pubSub = new PubSub(); // GraphQL PubSub instance
 
 @Resolver(() => Comment)
+@UseGuards(AccessTokenGuard)
+@UseGuards(ApiKeyGuard)
 export class CommentResolver {
   constructor(private readonly commentService: CommentService) {}
 
@@ -23,7 +28,6 @@ export class CommentResolver {
   async createComment(
     @Args('input') input: CreateCommentInput,
   ): Promise<Comment> {
-    console.log(input);
     const newComment = await this.commentService.createComment(input);
 
     // Publish to GraphQL subscription after creating a comment

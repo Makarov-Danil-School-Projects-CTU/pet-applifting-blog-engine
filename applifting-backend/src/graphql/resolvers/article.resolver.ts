@@ -1,11 +1,16 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { ArticleService } from 'src/article/article.service';
-import { Article } from 'src/entities/article.entity';
+import { AccessTokenGuard } from 'src/guards/access-token.guard';
+import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { Article } from '../../entities/article.entity';
 import { CreateArticleInput } from '../inputs/create-article.input';
 import { UpdateArticleInput } from '../inputs/update-article.input';
 
 @Resolver(() => Article)
+@UseGuards(AccessTokenGuard)
+@UseGuards(ApiKeyGuard)
 export class ArticleResolver {
   constructor(private readonly articleService: ArticleService) {}
 

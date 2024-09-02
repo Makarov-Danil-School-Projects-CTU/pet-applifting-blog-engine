@@ -1,0 +1,22 @@
+type Image {
+  imageId: ID!
+  name: String!
+  url: String!
+  mimeType: String!
+  article: Article # Nullable because deleting an Image sets the article reference to NULL
+}
+
+input UploadImageInput {
+  articleId: ID! # Non-nullable because an Image must be associated with an Article
+  name: String! # Non-nullable because the Image must have a name (filename)
+  mimeType: String! # Non-nullable because the Image must have a MIME type
+}
+
+type Mutation {
+  uploadImage(input: UploadImageInput!): Image!
+  deleteImage(imageId: ID!): Boolean!
+}
+
+type Query {
+  getImage(imageId: ID!): Image
+}
