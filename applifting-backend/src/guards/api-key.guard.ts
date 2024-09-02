@@ -4,12 +4,25 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
+// This is a custom guard for handling GraphQL requests
 @Injectable()
-export class XApiKeyGuard implements CanActivate {
+export class ApiKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest() as Request;
-    console.log(req);
+    /**
+     * For GraphQL, the execution context in NestJS uses GqlExecutionContext 
+     * rather than the default HTTP context. Because of that, we cannot use 
+     * context.switchToHttp(). It's undefined
+     */
+    const ctx = GqlExecutionContext.create(context);
+    const req = ctx.getContext().req;
+  
+
+    if (!req) {
+      throw new UnauthorizedException('Request object is missing');
+    }
+
     const apiKey = req.headers['x-api-key'];
 
     if (!apiKey) {
