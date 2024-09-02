@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 
-import { setToken } from 'src/token-store';
-import { LoginResponse } from './auth.controller';
+import { setToken } from '../token-store';
 import { LoginUserDto } from './dtos/login-user.dto';
+import { LoginResponseDto } from './dtos/login-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,11 +13,11 @@ export class AuthService {
   async login(
     loginUserDto: LoginUserDto,
     apiKey: string,
-  ): Promise<LoginResponse> {
+  ): Promise<LoginResponseDto> {
     const { username, password } = loginUserDto;
 
     try {
-      const response = await axios.post<LoginResponse>(
+      const response = await axios.post<LoginResponseDto>(
         this.loginApiUrl,
         { username, password },
         {
