@@ -17,7 +17,11 @@ COPY . .
 RUN npm run build
 
 # Expose the port the app runs on
-EXPOSE 3000
+# HTTP
+EXPOSE 4000
+
+# WebSockets
+EXPOSE 4001 
 
 # Start the application
 CMD ["npm", "run", "start:prod"]

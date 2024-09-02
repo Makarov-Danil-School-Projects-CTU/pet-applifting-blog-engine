@@ -6,7 +6,8 @@ services:
       context: ./applifting-backend
       dockerfile: .Dockerfile
     ports:
-      - '3000:3000'
+      - '4000:4000'
+      - '4001:4001'
     depends_on:
       - db
     environment:
