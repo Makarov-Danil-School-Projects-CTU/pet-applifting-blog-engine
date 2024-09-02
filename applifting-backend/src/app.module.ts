@@ -6,8 +6,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
@@ -40,7 +38,15 @@ import { TenantModule } from './tenant/tenant.module';
     CommentModule,
     ImageModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    // Comment if we work with graphql
+    // this validation pipe does not pass graphql requests
+    // {
+    //   provide: APP_PIPE,
+    //   useValue: new ValidationPipe({
+    //     whitelist: true
+    //   }),
+    // },
+  ],
 })
 export class AppModule {}
