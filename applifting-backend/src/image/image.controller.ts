@@ -4,34 +4,106 @@ import {
   Get,
   Param,
   Post,
-  UploadedFiles,
+  Res,
+  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
-import { multerConfig } from 'src/config/multer.config';
-import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { ImageDto } from './dtos/create-image.dto';
+import { Image } from '../entities/image.entity';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { ImageService } from './image.service';
+import {
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Response } from 'express';
+import { CreateImageDto } from './dtos/create-image.dto';
+import { ImageResponseDto } from './dtos/image-response.dto';
 
+@ApiTags('Images')
 @Controller('images')
-@Serialize(ImageDto)
+@Serialize(ImageResponseDto)
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
 
-  @Post()
-  @UseInterceptors(FilesInterceptor('files', 10, multerConfig)) // Max 10 files per request
-  async uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
-    return await this.imageService.uploadImages(files);
+  @Post(':articleId')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload an image for a specific article' })
+  @ApiParam({
+    name: 'articleId',
+    type: String,
+    description: 'The ID of the article to associate with the image',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({
+    status: 201,
+    description: 'Image successfully uploaded.',
+    type: ImageResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
+  async uploadImage(
+    @Param('articleId') articleId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<Image> {
+    const uploadInput = {
+      articleId,
+      name: file.originalname,
+      mimeType: file.mimetype,
+    } as CreateImageDto;
+
+    return this.imageService.uploadImage(uploadInput, file);
   }
 
-  @Get('/:imageId')
-  async getImageById(@Param('imageId') imageId: string) {
-    return await this.imageService.getImageById(imageId);
+  @Get(':imageId')
+  @ApiOperation({ summary: 'Download an image by ID' })
+  @ApiParam({
+    name: 'imageId',
+    type: String,
+    description: 'The ID of the image to download',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The image has been successfully downloaded.',
+    content: {
+      'application/octet-stream': {
+        schema: { type: 'string', format: 'binary' },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Image not found.' })
+  async downloadImage(
+    @Param('imageId') imageId: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    const { file, mimeType, filename, size } =
+      await this.imageService.getImageById(imageId);
+
+    // Set the correct headers for content type and content disposition
+    res.setHeader('Content-Type', mimeType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', size);
+    // Pipe the file stream to the response
+    file.pipe(res);
   }
 
-  @Delete('/:imageId')
-  async deleteImage(@Param('imageId') imageId: string) {
-    return await this.imageService.deleteImage(imageId);
+  @Delete(':imageId')
+  @ApiOperation({ summary: 'Delete an image by ID' })
+  @ApiParam({
+    name: 'imageId',
+    type: String,
+    description: 'The ID of the image to delete',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Image successfully deleted.',
+    type: Image,
+  })
+  @ApiResponse({ status: 404, description: 'Image not found.' })
+  async deleteImage(@Param('imageId') imageId: string): Promise<Image> {
+    return this.imageService.deleteImage(imageId);
   }
 }

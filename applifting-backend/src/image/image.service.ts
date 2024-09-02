@@ -1,61 +1,154 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { unlink } from 'fs/promises';
+import { createReadStream, ReadStream } from 'fs';
+import * as fs from 'fs/promises';
+import { join } from 'path';
 import { Repository } from 'typeorm';
 
-import { Image } from 'src/entities/image.entity';
+import { Image } from '..//entities/image.entity';
+import { Article } from '../entities/article.entity';
+import { CreateImageDto } from './dtos/create-image.dto';
 
 @Injectable()
 export class ImageService {
   constructor(
     @InjectRepository(Image)
     private readonly imageRepository: Repository<Image>,
+
+    @InjectRepository(Article)
+    private readonly articleRepository: Repository<Article>,
   ) {}
 
-  async uploadImages(files: Express.Multer.File[]): Promise<Image[]> {
-    const images: Image[] = [];
-
-    for (const file of files) {
-      const imageId = file.filename.split('.')[0];
-
-      const url = `/uploads/${file.filename}`; // Construct the URL based on the saved file path
-      // Save image metadata with the generated imageId
-      const image = this.imageRepository.create({
-        imageId, // Use the generated imageId
-        name: imageId,
-        path: file.path, // Path on the local disk
-        url, // URL to access the image
+  async getImageById(imageId: string): Promise<{
+    file: ReadStream;
+    mimeType: string;
+    filename: string;
+    size: number;
+  }> {
+    try {
+      // Find image metadata in the database
+      const image = await this.imageRepository.findOne({
+        where: { imageId },
+        relations: ['article'],
       });
 
-      images.push(await this.imageRepository.save(image));
-    }
+      if (!image) {
+        throw new NotFoundException(`Image with ID ${imageId} not found`);
+      }
 
-    return images;
+      // Construct the path to the image file
+      const imagePath = join(__dirname, '../../uploads', image.name);
+      // Check if the file exists before creating the read stream
+
+      try {
+        await fs.access(imagePath);
+      } catch {
+        throw new NotFoundException(
+          `Image file not found at path: ${imagePath}`,
+        );
+      }
+
+      const file = createReadStream(imagePath);
+      const stat = await fs.stat(imagePath);
+
+      return {
+        file,
+        mimeType: image.mimeType,
+        filename: image.name,
+        size: stat.size,
+      };
+    } catch (error) {
+      throw new NotFoundException(
+        `Failed to retrieve image with ID ${imageId}: ${error.message}`,
+      );
+    }
   }
 
-  async getImageById(imageId: string): Promise<Image> {
-    const image = await this.imageRepository.findOne({ where: { imageId } });
-    if (!image) {
-      throw new NotFoundException(`Image with ID ${imageId} not found`);
+  async uploadImage(
+    imageDto: CreateImageDto,
+    file: Express.Multer.File,
+  ): Promise<Image> {
+    const { articleId } = imageDto;
+
+    const article = await this.articleRepository.findOne({
+      where: { articleId },
+      relations: ['image'],
+    });
+
+    if (!article) {
+      throw new NotFoundException(`Article with ID ${articleId} not found`);
     }
-    return image;
+
+    const uploadDir = join(__dirname, '../../uploads');
+    const filePath = join(uploadDir, file.originalname);
+
+    // Check if the article already has an image and delete it
+    if (article.image) {
+      const oldImagePath = join(uploadDir, article.image.name);
+
+      try {
+        // Remove old image from filesystem if it exists
+        await fs.unlink(oldImagePath);
+      } catch (err) {
+        if (err.code !== 'ENOENT') {
+          // Ignore error if the file does not exist
+          throw err;
+        }
+      }
+
+      await this.imageRepository.delete({ imageId: article.image.imageId });
+    }
+
+    // Store the new file on disk
+
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+    } catch (err) {
+      throw new Error(`Failed to create upload directory: ${err.message}`);
+    }
+
+    try {
+      await fs.writeFile(filePath, file.buffer);
+    } catch (err) {
+      throw new Error(`Failed to write file: ${err.message}`);
+    }
+
+    // Create a new image record
+    const image = this.imageRepository.create({
+      name: file.originalname,
+      mimeType: file.mimetype,
+      url: `http://localhost:4000/uploads/${file.originalname}`, // Adjust URL to match your server setup
+      article,
+    });
+
+    return this.imageRepository.save(image);
   }
 
   async deleteImage(imageId: string): Promise<Image> {
-    const image = await this.getImageById(imageId); // Get the image to ensure it exists
-
-    const result = await this.imageRepository.delete({ imageId });
-    if (result.affected === 0) {
-      throw new NotFoundException(`Image with ID ${imageId} not found`);
-    }
-
-    // Delete the file from the local storage
     try {
-      await unlink(image.path); // Delete the file from disk
-    } catch (error) {
-      console.error(`Failed to delete image file from disk: ${error.message}`);
-    }
+      const image = await this.imageRepository.findOne({ where: { imageId } });
 
-    return image;
+      if (!image) {
+        throw new NotFoundException('Image was not found');
+      }
+
+      // Construct the file path to delete the image from the filesystem
+      const imagePath = join(__dirname, '../../uploads', image.name);
+      try {
+        await fs.unlink(imagePath);
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw new Error(`Failed to delete image file: ${error.message}`);
+        }
+        // If the file does not exist, proceed without throwing an error
+      }
+
+      await this.imageRepository.delete({ imageId });
+      return image;
+    } catch (error) {
+      throw new NotFoundException(
+        `Failed to delete image with ID ${imageId}: ${error.message}`,
+      );
+    }
   }
 }
