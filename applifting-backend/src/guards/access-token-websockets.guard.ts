@@ -12,7 +12,7 @@ import { isTokenValid } from '../token-store';
 // This is a custom guard for handling GraphQL requests
 // For websockets req is different. Because of that we have 2 versions for HTTP and WebSockets
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
+export class AccessTokenGuardWebsockets implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     /**
      * For GraphQL, the execution context in NestJS uses GqlExecutionContext
@@ -20,8 +20,8 @@ export class AccessTokenGuard implements CanActivate {
      * context.switchToHttp(). It's undefined
      */
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
-    const token = req.headers['authorization'];
+    const { req } = ctx.getContext();
+    const token = req.connectionParams['Authorization'];
 
     if (!token) {
       throw new HttpException(

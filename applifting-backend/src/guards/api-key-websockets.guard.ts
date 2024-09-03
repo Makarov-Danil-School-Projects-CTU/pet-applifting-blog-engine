@@ -1,18 +1,15 @@
 import {
   CanActivate,
   ExecutionContext,
-  HttpException,
-  HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-
-import { isTokenValid } from '../token-store';
 
 // This is a custom guard for handling GraphQL requests
 // For websockets req is different. Because of that we have 2 versions for HTTP and WebSockets
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
+export class ApiKeyGuardWebsockets implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     /**
      * For GraphQL, the execution context in NestJS uses GqlExecutionContext
@@ -20,21 +17,11 @@ export class AccessTokenGuard implements CanActivate {
      * context.switchToHttp(). It's undefined
      */
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
-    const token = req.headers['authorization'];
-
-    if (!token) {
-      throw new HttpException(
-        'Missing Authorization header',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    if (!isTokenValid(token)) {
-      throw new HttpException(
-        'Invalid or expired access token',
-        HttpStatus.UNAUTHORIZED,
-      );
+    const { req } = ctx.getContext();
+    const apiKey = req.connectionParams['X-API-KEY'];
+    
+    if (!apiKey) {
+      throw new UnauthorizedException('x-api-key header is missing');
     }
 
     return true;
