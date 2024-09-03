@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { createReadStream } from 'fs';
 
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
-import { Response } from 'express';
-import { createReadStream } from 'fs';
 
 const mockImage = {
   imageId: '1',

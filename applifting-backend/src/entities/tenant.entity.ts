@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 import {
   AfterInsert,
   AfterRemove,
@@ -14,22 +16,38 @@ import { Article } from './article.entity';
 
 @Entity('tenants')
 export class Tenant {
+  @ApiProperty({ description: 'The unique identifier of the tenant' })
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   tenantId: string;
 
+  @ApiProperty({ description: 'The unique apiKey from the external service' })
   @Column({ unique: true })
+  @IsString()
+  @IsNotEmpty()
+  @Length(2, 30)
   apiKey: string;
 
+  @ApiProperty({ description: 'The name of the tenant' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   name: string;
 
+  @ApiProperty({ description: 'The hashed password of the tenant' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   password: string;
 
+  @ApiProperty({ description: 'The date when the tenant was created' })
   @CreateDateColumn()
+  @IsDate()
   createdAt: Date;
 
+  @ApiProperty({ description: 'The date when the article was last updated' })
   @UpdateDateColumn({ nullable: true })
+  @IsDate()
   lastUsedAt: Date;
   
 

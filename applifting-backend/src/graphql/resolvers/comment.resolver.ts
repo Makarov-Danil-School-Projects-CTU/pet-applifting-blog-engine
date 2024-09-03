@@ -10,10 +10,10 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { CommentService } from '../../comment/comment.service';
 import { Comment } from '../../entities/comment.entity';
+import { AccessTokenGuardWebsockets } from '../../guards/access-token-websockets.guard';
+import { ApiKeyGuardWebsockets } from '../../guards/api-key-websockets.guard';
 import { CreateCommentInput } from '../inputs/create-comment.input';
 import { VoteCommentInput } from '../inputs/vote-comment.input';
-import { ApiKeyGuardWebsockets } from '../../guards/api-key-websockets.guard';
-import { AccessTokenGuardWebsockets } from '../../guards/access-token-websockets.guard';
 
 const pubSub = new PubSub(); // GraphQL PubSub instance
 

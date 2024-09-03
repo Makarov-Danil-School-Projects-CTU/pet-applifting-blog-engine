@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import axios from 'axios';
 
 import { setToken } from '../token-store';
-import { LoginUserDto } from './dtos/login-user.dto';
 import { LoginResponseDto } from './dtos/login-response.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @Injectable()
 export class AuthService {

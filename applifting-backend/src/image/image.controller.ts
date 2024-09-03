@@ -9,23 +9,27 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-
-import { Image } from '../entities/image.entity';
-import { Serialize } from '../interceptors/serialize.interceptor';
-import { ImageService } from './image.service';
 import {
+  ApiBody,
   ApiConsumes,
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { Response } from 'express';
+
+import { Image } from '../entities/image.entity';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateImageDto } from './dtos/create-image.dto';
 import { ImageResponseDto } from './dtos/image-response.dto';
+import { ImageService } from './image.service';
 
 @ApiTags('Images')
 @Controller('images')
+@ApiSecurity('ApiKeyAuth')
+@ApiSecurity('UUIDAuth')
 @Serialize(ImageResponseDto)
 export class ImageController {
   constructor(private readonly imageService: ImageService) {}
@@ -39,6 +43,24 @@ export class ImageController {
     description: 'The ID of the article to associate with the image',
   })
   @ApiConsumes('multipart/form-data')
+  @ApiParam({
+    name: 'articleId',
+    type: String,
+    description: 'The ID of the article to associate with the image',
+  })
+  @ApiBody({
+    description: 'Image file',
+    required: true,
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Image successfully uploaded.',

@@ -1,4 +1,5 @@
 import { Expose, Transform, Type } from "class-transformer"
+
 import { CommentResponseDto } from "../../comment/dtos/comment-response.dto"
 
 export class ArticleResponseDto {
@@ -22,6 +23,10 @@ export class ArticleResponseDto {
   @Type(() => CommentResponseDto)
   comments: CommentResponseDto[];
 
+  @Expose()
+  @Transform(({ obj }) => obj.image ? obj.image.imageId : null)
+  imageId: string | null
+  
   @Expose()
   lastUpdatedAt: Date
 

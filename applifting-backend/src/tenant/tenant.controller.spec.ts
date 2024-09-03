@@ -1,10 +1,10 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TenantController } from './tenant.controller';
 
-import { TenantService } from './tenant.service';
 import { CreateTenantDto } from './dtos/create-tenant.dto';
 import { TenantResponseDto } from './dtos/tenant-response.dto';
-import { NotFoundException } from '@nestjs/common';
+import { TenantController } from './tenant.controller';
+import { TenantService } from './tenant.service';
 
 const mockTenant = {
   tenantId: '1',

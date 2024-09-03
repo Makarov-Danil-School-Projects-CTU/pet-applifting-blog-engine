@@ -1,3 +1,4 @@
+import { IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
   AfterInsert,
   AfterRemove,
@@ -14,12 +15,16 @@ import { Comment } from './comment.entity';
 @Entity('comment_votes')
 export class CommentVote {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   voteId: string;
 
   @Column()
+  @IsString()
+  @IsNotEmpty()
   ipAddress: string;
 
   @Column({ type: 'int', default: 0 })
+  @IsInt()
   value: number; // +1 for upvote, -1 for downvote
 
   @ManyToOne(() => Comment, (comment) => comment.votes, { onDelete: 'CASCADE' })

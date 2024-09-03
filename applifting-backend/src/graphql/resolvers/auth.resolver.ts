@@ -1,10 +1,10 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { AuthService } from '../../auth/auth.service';
-import { LoginInput } from '../inputs/login.input';
 import { LoginResponseDto } from '../../auth/dtos/login-response.dto';
-import { UseGuards } from '@nestjs/common';
 import { ApiKeyGuard } from '../../guards/api-key.guard';
+import { LoginInput } from '../inputs/login.input';
 
 @Resolver('Auth')
 @UseGuards(ApiKeyGuard)

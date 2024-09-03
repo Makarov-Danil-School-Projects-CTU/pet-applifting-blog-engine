@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { Article } from '../entities/article.entity';
 import { Tenant } from '../entities/tenant.entity';
-import { Repository } from 'typeorm';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateArticleDto } from './dtos/update-article.dto';
 
@@ -36,14 +36,14 @@ export class ArticleService {
 
   async getAllArticles(): Promise<Article[]> {
     return await this.articleRepository.find({
-      relations: ['tenant', 'comments', 'comments.article'],
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
   }
 
   async getArticleById(articleId: string): Promise<Article> {
     return await this.articleRepository.findOne({
       where: { articleId },
-      relations: ['tenant', 'comments', 'comments.article'],
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
   }
 

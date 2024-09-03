@@ -16,11 +16,14 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateCommentDto } from './dtos/create-comment.dto';
 
 @ApiTags('Comments')
+@ApiSecurity('ApiKeyAuth')
+@ApiSecurity('UUIDAuth')
 @Controller('comments')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}

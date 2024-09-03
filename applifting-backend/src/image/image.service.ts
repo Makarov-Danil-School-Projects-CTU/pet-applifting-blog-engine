@@ -5,8 +5,8 @@ import * as fs from 'fs/promises';
 import { join } from 'path';
 import { Repository } from 'typeorm';
 
-import { Image } from '..//entities/image.entity';
 import { Article } from '../entities/article.entity';
+import { Image } from '../entities/image.entity';
 import { CreateImageDto } from './dtos/create-image.dto';
 
 @Injectable()

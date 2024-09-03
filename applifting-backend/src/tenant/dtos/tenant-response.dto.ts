@@ -7,17 +7,14 @@ export class TenantResponseDto {
   tenantId: string;
 
   @ApiProperty({ description: 'The API key associated with the tenant' })
-  @ApiProperty()
   @Expose()
   apiKey: string;
 
   @ApiProperty({ description: 'The name of the tenant' })
-  @ApiProperty()
   @Expose()
   name: string;
 
   @ApiProperty({ description: 'The date the tenant was created' })
-  @ApiProperty()
   @Expose()
   createdAt: string;
 
@@ -25,7 +22,6 @@ export class TenantResponseDto {
     description: 'The date the tenant was last used',
     nullable: true,
   })
-  @ApiProperty()
   @Expose()
   lastUsedAt: string | null;
 }

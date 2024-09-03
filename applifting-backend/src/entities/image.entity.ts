@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
   AfterInsert,
   AfterRemove,
@@ -10,24 +12,30 @@ import {
 } from 'typeorm';
 
 import { Article } from './article.entity';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('images')
 export class Image {
   @ApiProperty({ description: 'The unique identifier of the image' })
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   imageId: string;
 
   @ApiProperty({ description: 'The original name of the uploaded image file' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   name: string; // original filename
 
   @ApiProperty({ description: 'The URL where the uploaded image can be accessed' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   url: string; // URL to access the image
 
   @ApiProperty({ description: 'The MIME type of the uploaded image file' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   mimeType: string;
 
   @ApiProperty({ description: 'The article to which this image belongs', type: () => Article })

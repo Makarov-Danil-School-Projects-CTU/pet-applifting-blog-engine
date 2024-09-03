@@ -55,7 +55,7 @@ export class TenantService {
 
       // Join the hashed result and the salt together
       const result = salt + '.' + hash.toString('hex');
-      console.log(result)
+      
       const tenantData = response.data;
 
       const tenant = this.tenantRepository.create({

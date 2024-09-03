@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { Article } from '../entities/article.entity';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
-import { Article } from '../entities/article.entity';
-import { UpdateArticleDto } from './dtos/update-article.dto';
 import { CreateArticleDto } from './dtos/create-article.dto';
+import { UpdateArticleDto } from './dtos/update-article.dto';
 
 // Mock Data and Setup
 const articles: Article[] = [

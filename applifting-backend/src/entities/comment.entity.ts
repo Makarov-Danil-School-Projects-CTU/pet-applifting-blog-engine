@@ -1,3 +1,4 @@
+import { IsDate, IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
   AfterInsert,
   AfterRemove,
@@ -17,18 +18,25 @@ import { CommentVote } from './comment-vote.entity';
 @Entity('comments')
 export class Comment {
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   commentId: string;
 
   @Column()
+  @IsString()
+  @IsNotEmpty()
   author: string;
 
   @Column()
+  @IsString()
+  @IsNotEmpty()
   content: string;
 
   @CreateDateColumn()
+  @IsDate()
   postedAt: Date;
 
   @Column({ type: 'int', default: 0 })
+  @IsInt()
   score: number;
 
   @ManyToOne(() => Article, (article) => article.comments, {

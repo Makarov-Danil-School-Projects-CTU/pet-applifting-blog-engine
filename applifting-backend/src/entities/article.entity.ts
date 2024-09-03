@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 import {
   AfterInsert,
   AfterRemove,
@@ -13,7 +15,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { ApiProperty } from '@nestjs/swagger';
 import { Comment } from './comment.entity';
 import { Image } from './image.entity';
 import { Tenant } from './tenant.entity';
@@ -22,26 +23,37 @@ import { Tenant } from './tenant.entity';
 export class Article {
   @ApiProperty({ description: 'The unique identifier of the article' })
   @PrimaryGeneratedColumn('uuid')
+  @IsUUID()
   articleId: string;
 
   @ApiProperty({ description: 'The title of the article' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
+  @Length(5, 100)
   title: string;
 
   @ApiProperty({ description: 'A short description of the article' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
+  @Length(5, 255)
   perex: string;
 
   @ApiProperty({ description: 'The content of the article' })
   @Column()
+  @IsString()
+  @IsNotEmpty()
   content: string;
 
   @ApiProperty({ description: 'The date when the article was created' })
   @CreateDateColumn()
+  @IsDate()
   createdAt: Date;
 
   @ApiProperty({ description: 'The date when the article was last updated' })
   @UpdateDateColumn({ nullable: true })
+  @IsDate()
   lastUpdatedAt: Date;
 
    /**

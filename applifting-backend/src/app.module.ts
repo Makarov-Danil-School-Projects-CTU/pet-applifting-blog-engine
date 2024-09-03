@@ -1,18 +1,18 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 
-import { ConfigModule } from '@nestjs/config';
+import { AppDataSource } from '../data-source';
 import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
 import { ImageModule } from './image/image.module';
 import { TenantModule } from './tenant/tenant.module';
-import { AppDataSource } from '../data-source';
 
 @Module({
   imports: [

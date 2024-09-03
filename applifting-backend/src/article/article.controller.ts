@@ -38,7 +38,7 @@ export class ArticleController {
     description: 'List of all articles',
     type: [Article],
   })
-  getAllArticles() {
+  getAllArticles(): Promise<Article[]> {
     return this.articleService.getAllArticles();
   }
 
@@ -55,7 +55,7 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 404, description: 'Article not found.' })
-  getArticleById(@Param('articleId') articleId: string) {
+  getArticleById(@Param('articleId') articleId: string): Promise<Article> {
     return this.articleService.getArticleById(articleId);
   }
 
@@ -71,7 +71,7 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  createArticle(@Body() createArticleDto: CreateArticleDto) {
+  createArticle(@Body() createArticleDto: CreateArticleDto): Promise<Article> {
     return this.articleService.createArticle(createArticleDto);
   }
 
@@ -96,7 +96,7 @@ export class ArticleController {
   updateArticle(
     @Param('articleId') articleId: string,
     @Body() updateArticleDto: UpdateArticleDto,
-  ) {
+  ): Promise<Article> {
     return this.articleService.updateArticle(articleId, updateArticleDto);
   }
 
@@ -113,7 +113,7 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 404, description: 'Article not found.' })
-  deleteArticle(@Param('articleId') articleId: string) {
+  deleteArticle(@Param('articleId') articleId: string): Promise<Article> {
     return this.articleService.deleteArticle(articleId);
   }
 }
