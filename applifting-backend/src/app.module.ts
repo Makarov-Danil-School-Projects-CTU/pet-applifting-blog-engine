@@ -27,7 +27,6 @@ import { AppDataSource } from '../data-source';
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     // TypeOrmModule.forRoot(typeOrmConfig),
-    // TypeOrmModule.forRoot(),
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
         return AppDataSource.options;  // Return the options from your DataSource

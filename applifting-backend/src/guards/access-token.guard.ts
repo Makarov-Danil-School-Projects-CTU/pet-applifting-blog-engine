@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { isTokenValid } from 'src/token-store';
+import { isTokenValid } from '../token-store';
 
 // This is a custom guard for handling GraphQL requests
 @Injectable()

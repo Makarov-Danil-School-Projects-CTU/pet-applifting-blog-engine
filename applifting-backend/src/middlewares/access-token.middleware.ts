@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 
-import { isTokenValid } from 'src/token-store';
+import { isTokenValid } from '../token-store';
 
 @Injectable()
 export class AccessTokenMiddleware implements NestMiddleware {

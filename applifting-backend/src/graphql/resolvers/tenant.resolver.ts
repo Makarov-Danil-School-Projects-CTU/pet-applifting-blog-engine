@@ -1,8 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { Tenant } from 'src/entities/tenant.entity';
-import { TenantService } from 'src/tenant/tenant.service';
+import { Tenant } from '../../entities/tenant.entity';
+import { TenantService } from '../../tenant/tenant.service';
 import { CreateTenantInput } from '../inputs/create-tenant.input';
 
 @Resolver('Tenant')

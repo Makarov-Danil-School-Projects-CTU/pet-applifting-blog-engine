@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 
-import { ApiKeyMiddleware } from 'src/middlewares/api-key.middleware';
+import { ApiKeyMiddleware } from '..//middlewares/api-key.middleware';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { AuthResolver } from 'src/graphql/resolvers/auth.resolver';
+import { AuthResolver } from '../graphql/resolvers/auth.resolver';
 
 @Module({
   controllers: [AuthController],

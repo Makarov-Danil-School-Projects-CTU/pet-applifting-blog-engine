@@ -3,13 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Article } from '../entities/article.entity';
 import { CommentVote } from '../entities/comment-vote.entity';
-import { Comment } from 'src/entities/comment.entity';
-import { AccessTokenMiddleware } from 'src/middlewares/access-token.middleware';
-import { ApiKeyMiddleware } from 'src/middlewares/api-key.middleware';
+import { Comment } from '../entities/comment.entity';
+import { AccessTokenMiddleware } from '../middlewares/access-token.middleware';
+import { ApiKeyMiddleware } from '../middlewares/api-key.middleware';
 import { CommentController } from './comment.controller';
 // import { CommentsGateway } from './comment.gateway';
 import { CommentService } from './comment.service';
-import { CommentResolver } from 'src/graphql/resolvers/comment.resolver';
+import { CommentResolver } from '../graphql/resolvers/comment.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Comment, CommentVote, Article])],

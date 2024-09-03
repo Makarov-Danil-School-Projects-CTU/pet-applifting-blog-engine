@@ -8,10 +8,10 @@ import {
 } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 
-import { CommentService } from 'src/comment/comment.service';
-import { Comment } from 'src/entities/comment.entity';
-import { AccessTokenGuard } from 'src/guards/access-token.guard';
-import { ApiKeyGuard } from 'src/guards/api-key.guard';
+import { CommentService } from '../../comment/comment.service';
+import { Comment } from '../../entities/comment.entity';
+import { AccessTokenGuard } from '../../guards/access-token.guard';
+import { ApiKeyGuard } from '../../guards/api-key.guard';
 import { CreateCommentInput } from '../inputs/create-comment.input';
 import { VoteCommentInput } from '../inputs/vote-comment.input';
 
