@@ -9,5 +9,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'applifting',
   entities: [join(__dirname, '/../**/*.entity.{js,ts}')],
-  synchronize: true,
+  synchronize: true
 };

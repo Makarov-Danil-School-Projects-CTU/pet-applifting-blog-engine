@@ -6,16 +6,33 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
 import { typeOrmConfig } from './config/typeorm.config';
+import { Article } from './entities/article.entity';
+import { CommentVote } from './entities/comment-vote.entity';
+import { Comment } from './entities/comment.entity';
+import { Image } from './entities/image.entity';
+import { Tenant } from './entities/tenant.entity';
 import { ImageModule } from './image/image.module';
 import { TenantModule } from './tenant/tenant.module';
+import { AppDataSource } from '../data-source';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    // TypeOrmModule.forRoot(typeOrmConfig),
+    // TypeOrmModule.forRoot(),
+    TypeOrmModule.forRootAsync({
+      useFactory: async () => {
+        return AppDataSource.options;  // Return the options from your DataSource
+      },
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
