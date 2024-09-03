@@ -36,14 +36,14 @@ export class ArticleService {
 
   async getAllArticles(): Promise<Article[]> {
     return await this.articleRepository.find({
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
   }
 
   async getArticleById(articleId: string): Promise<Article> {
     return await this.articleRepository.findOne({
       where: { articleId },
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
   }
 

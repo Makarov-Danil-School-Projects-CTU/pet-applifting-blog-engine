@@ -32,7 +32,6 @@ export class AuthController {
     // @Headers('X-API-KEY') apiKey: string
     @Req() req: Request
   ): Promise<LoginResponseDto> {
-    console.log(body)
     const apiKey = req.headers['x-api-key'] as string;
     return this.authService.login(body, apiKey);
   }

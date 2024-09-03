@@ -10,16 +10,18 @@ import { PubSub } from 'graphql-subscriptions';
 
 import { CommentService } from '../../comment/comment.service';
 import { Comment } from '../../entities/comment.entity';
-import { AccessTokenGuard } from '../../guards/access-token.guard';
-import { ApiKeyGuard } from '../../guards/api-key.guard';
 import { CreateCommentInput } from '../inputs/create-comment.input';
 import { VoteCommentInput } from '../inputs/vote-comment.input';
+import { ApiKeyGuardWebsockets } from '../../guards/api-key-websockets.guard';
+import { AccessTokenGuardWebsockets } from '../../guards/access-token-websockets.guard';
 
 const pubSub = new PubSub(); // GraphQL PubSub instance
 
 @Resolver(() => Comment)
-@UseGuards(AccessTokenGuard)
-@UseGuards(ApiKeyGuard)
+// This is a custom guard for handling GraphQL requests
+// For websockets req is different. Because of that we have 2 versions for HTTP and WebSockets
+@UseGuards(AccessTokenGuardWebsockets)
+@UseGuards(ApiKeyGuardWebsockets)
 export class CommentResolver {
   constructor(private readonly commentService: CommentService) {}
 

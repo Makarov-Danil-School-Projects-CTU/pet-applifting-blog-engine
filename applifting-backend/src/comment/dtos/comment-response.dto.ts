@@ -9,6 +9,7 @@ export class CommentResponseDto {
   @ApiProperty({
     description: 'The ID of the article the comment is related to',
   })
+  
   @Transform(({ obj }) => obj.article.articleId)
   @Expose()
   articleId: string;

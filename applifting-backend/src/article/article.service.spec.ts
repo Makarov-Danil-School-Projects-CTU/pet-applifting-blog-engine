@@ -105,7 +105,7 @@ describe('ArticleService', () => {
     const result = await service.getAllArticles();
     
     expect(articleRepository.find).toHaveBeenCalledWith({
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
     expect(result).toEqual([mockArticle]);
   });
@@ -116,7 +116,7 @@ describe('ArticleService', () => {
     
     expect(articleRepository.findOne).toHaveBeenCalledWith({
       where: { articleId },
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
     expect(result).toEqual(mockArticle);
   });
@@ -130,7 +130,7 @@ describe('ArticleService', () => {
     expect(articleRepository.update).toHaveBeenCalledWith({ articleId }, updateArticleDto);
     expect(articleRepository.findOne).toHaveBeenCalledWith({
       where: { articleId },
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
     expect(result).toEqual(mockArticle);
   });
@@ -142,7 +142,7 @@ describe('ArticleService', () => {
     
     expect(articleRepository.findOne).toHaveBeenCalledWith({
       where: { articleId },
-      relations: ['tenant', 'comments'],
+      relations: ['tenant', 'comments', 'comments.article'],
     });
     expect(articleRepository.delete).toHaveBeenCalledWith({ articleId });
     expect(result).toEqual(mockArticle);

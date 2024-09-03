@@ -1,5 +1,5 @@
-import { Expose, Transform } from "class-transformer"
-import { Comment } from "../../entities/comment.entity"
+import { Expose, Transform, Type } from "class-transformer"
+import { CommentResponseDto } from "../../comment/dtos/comment-response.dto"
 
 export class ArticleResponseDto {
   @Expose()
@@ -19,7 +19,8 @@ export class ArticleResponseDto {
   tenantId: string
 
   @Expose()
-  comments: Comment[]
+  @Type(() => CommentResponseDto)
+  comments: CommentResponseDto[];
 
   @Expose()
   lastUpdatedAt: Date

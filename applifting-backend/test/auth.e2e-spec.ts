@@ -5,12 +5,12 @@ import { AppModule } from './../src/app.module';
 
 describe('Authentication System', () => {
   let app: INestApplication;
-  let tenantName = 'testTenant';
-  let tenantPassword = 'testPassword';
   let apiKey: string;
   let accessToken: string;
-
+  
   // Tenant
+  let tenantName = 'testTenant';
+  let tenantPassword = 'testPassword';
   let tenantId: string;
 
   // Article
