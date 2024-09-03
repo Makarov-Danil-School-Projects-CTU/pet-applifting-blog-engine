@@ -10,7 +10,6 @@ var dbConfig = {
 // Adding properties for each case
 switch (process.env.NODE_ENV) {
   case 'development':
-    // SQLite configuration
     Object.assign(dbConfig, {
       type: 'postgres',
       host: process.env.DATABASE_HOST || 'localhost',
@@ -23,7 +22,6 @@ switch (process.env.NODE_ENV) {
     });
     break;
   case 'test':
-    // SQLite configuration
     Object.assign(dbConfig, {
       type: 'postgres',
       host: process.env.DATABASE_HOST || 'localhost',

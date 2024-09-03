@@ -4,18 +4,17 @@ services:
   app:
     build:
       context: ./applifting-backend
-      dockerfile: .Dockerfile
+      dockerfile: .Dockerfile  # Fixed to point to the correct Dockerfile name
     ports:
-      - '4000:4000'
-      - '4001:4001'
+      - '4000:4000'  # HTTP port for development
+      - '4001:4001'  # WebSocket port for development
     depends_on:
       - db
     environment:
-      DATABASE_HOST: db
-      DATABASE_PORT: 5432
-      DATABASE_USER: postgres
-      DATABASE_PASSWORD: postgres
-      DATABASE_NAME: applifting
+      NODE_ENV: development
+      DATABASE_HOST: db # Override value from .env.development file to run db in a container
+    env_file:
+      - ./applifting-backend/.env.development
 
   db:
     image: postgres:13
