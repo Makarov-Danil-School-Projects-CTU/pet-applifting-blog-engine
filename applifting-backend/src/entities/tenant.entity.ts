@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -14,7 +14,7 @@ import { Article } from './article.entity';
 
 @Entity('tenants')
 export class Tenant {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   tenantId: string;
 
   @Column({ unique: true })
