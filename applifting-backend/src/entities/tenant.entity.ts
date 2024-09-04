@@ -1,60 +1,49 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 import {
-  AfterInsert,
-  AfterRemove,
-  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Article } from './article.entity';
+import { CommentVote } from './comment-vote.entity';
+import { Comment } from './comment.entity';
+import { Image } from './image.entity';
 
 @Entity('tenants')
 export class Tenant {
   @ApiProperty({ description: 'The unique identifier of the tenant' })
   @PrimaryGeneratedColumn('uuid')
-  @IsUUID()
   tenantId: string;
 
   @ApiProperty({ description: 'The unique apiKey from the external service' })
   @Column({ unique: true })
-  @IsString()
-  @IsNotEmpty()
-  @Length(2, 30)
   apiKey: string;
 
   @ApiProperty({ description: 'The name of the tenant' })
   @Column()
-  @IsString()
-  @IsNotEmpty()
   name: string;
 
   @ApiProperty({ description: 'The hashed password of the tenant' })
   @Column()
-  @IsString()
-  @IsNotEmpty()
   password: string;
 
   @ApiProperty({ description: 'The date when the tenant was created' })
   @CreateDateColumn()
-  @IsDate()
   createdAt: Date;
 
   @ApiProperty({ description: 'The date when the article was last updated' })
   @UpdateDateColumn({ nullable: true })
-  @IsDate()
   lastUsedAt: Date;
-  
 
-  /** 
+  /**
    * Using cascade (TypeORM level):
-   * If you have a parent entity (Tenant) with children (Articles) and want TypeORM to automatically 
-   * delete associated Articles when you call .remove(tenant) in your application code, 
+   * If you have a parent entity (Tenant) with children (Articles) and want TypeORM to automatically
+   * delete associated Articles when you call .remove(tenant) in your application code,
    * you would use cascade: ['remove']. cascade: true includes all the operatins such as insert, update, etc.
    * **/
   @OneToMany(() => Article, (article) => article.tenant, {
@@ -62,18 +51,19 @@ export class Tenant {
   })
   articles: Article[];
 
-  // @AfterInsert()
-  // logInsert() {
-  //   console.log('Inserted Tenant with id', this.tenantId);
-  // }
+  @OneToMany(() => Comment, (comment) => comment.tenant, {
+    cascade: true,
+  })
+  comments: Comment[];
 
-  // @AfterUpdate()
-  // logUpdate() {
-  //   console.log('Updated Tenant with id', this.tenantId);
-  // }
+  @OneToMany(() => CommentVote, (commentVote) => commentVote.tenant, {
+    cascade: true,
+  })
+  commentVotes: CommentVote[];
 
-  // @AfterRemove()
-  // logRemove() {
-  //   console.log('Removed Tenant with id', this.tenantId);
-  // }
+  @OneToOne(() => Image, (image) => image.tenant, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  image: Image;
 }

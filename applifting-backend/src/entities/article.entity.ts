@@ -1,9 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
 import {
-  AfterInsert,
-  AfterRemove,
-  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -23,40 +19,29 @@ import { Tenant } from './tenant.entity';
 export class Article {
   @ApiProperty({ description: 'The unique identifier of the article' })
   @PrimaryGeneratedColumn('uuid')
-  @IsUUID()
   articleId: string;
 
   @ApiProperty({ description: 'The title of the article' })
   @Column()
-  @IsString()
-  @IsNotEmpty()
-  @Length(5, 100)
   title: string;
 
   @ApiProperty({ description: 'A short description of the article' })
   @Column()
-  @IsString()
-  @IsNotEmpty()
-  @Length(5, 255)
   perex: string;
 
   @ApiProperty({ description: 'The content of the article' })
   @Column()
-  @IsString()
-  @IsNotEmpty()
   content: string;
 
   @ApiProperty({ description: 'The date when the article was created' })
   @CreateDateColumn()
-  @IsDate()
   createdAt: Date;
 
   @ApiProperty({ description: 'The date when the article was last updated' })
   @UpdateDateColumn({ nullable: true })
-  @IsDate()
-  lastUpdatedAt: Date;
+  lastUpdatedAt: Date | null;
 
-   /**
+  /**
    * Using onDelete (database level):
    * If you have Tenant and Article tables in your database
    * and want to ensure that when an Tenant is deleted,
@@ -72,6 +57,10 @@ export class Article {
   @JoinColumn({ name: 'tenant_id' })
   tenant: Tenant;
 
+  @ApiProperty({
+    description: 'The article to which these comments belong',
+    type: () => Comment,
+  })
   @OneToMany(() => Comment, (comment) => comment.article, {
     cascade: true,
   })
@@ -85,26 +74,11 @@ export class Article {
    */
   @ApiProperty({
     description: 'The ID of the image associated with the article',
-    type: () => Tenant,
+    type: () => Image,
   })
   @OneToOne(() => Image, (image) => image.article, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   image: Image;
-
-  // @AfterInsert()
-  // logInsert() {
-  //   console.log('Inserted Article with id', this.articleId);
-  // }
-
-  // @AfterUpdate()
-  // logUpdate() {
-  //   console.log('Updated Article with id', this.articleId);
-  // }
-
-  // @AfterRemove()
-  // logRemove() {
-  //   console.log('Removed Article with id', this.articleId);
-  // }
 }

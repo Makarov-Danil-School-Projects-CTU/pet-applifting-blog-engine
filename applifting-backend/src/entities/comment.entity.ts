@@ -1,8 +1,4 @@
-import { IsDate, IsInt, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import {
-  AfterInsert,
-  AfterRemove,
-  AfterUpdate,
   Column,
   CreateDateColumn,
   Entity,
@@ -14,29 +10,23 @@ import {
 
 import { Article } from './article.entity';
 import { CommentVote } from './comment-vote.entity';
+import { Tenant } from './tenant.entity';
 
 @Entity('comments')
 export class Comment {
   @PrimaryGeneratedColumn('uuid')
-  @IsUUID()
   commentId: string;
 
   @Column()
-  @IsString()
-  @IsNotEmpty()
   author: string;
 
   @Column()
-  @IsString()
-  @IsNotEmpty()
   content: string;
 
   @CreateDateColumn()
-  @IsDate()
   postedAt: Date;
 
   @Column({ type: 'int', default: 0 })
-  @IsInt()
   score: number;
 
   @ManyToOne(() => Article, (article) => article.comments, {
@@ -50,18 +40,9 @@ export class Comment {
   })
   votes: CommentVote[];
 
-  // @AfterInsert()
-  // logInsert() {
-  //   console.log('Inserted Comment with id', this.commentId);
-  // }
-
-  // @AfterUpdate()
-  // logUpdate() {
-  //   console.log('Updated Comment with id', this.commentId);
-  // }
-
-  // @AfterRemove()
-  // logRemove() {
-  //   console.log('Removed Comment with id', this.commentId);
-  // }
+  @ManyToOne(() => Tenant, (tenant) => tenant.comments, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'tenant_id' })
+  tenant: Tenant;
 }
