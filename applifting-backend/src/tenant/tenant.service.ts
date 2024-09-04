@@ -25,9 +25,7 @@ interface ExternalApiTenantResponse {
 
 @Injectable()
 export class TenantService {
-  constructor(
-    @InjectRepository(Tenant) private tenantRepository
-  ) {}
+  constructor(@InjectRepository(Tenant) private tenantRepository) {}
 
   private tenantApiUrl = 'https://fullstack.exercise.applifting.cz/tenants';
 
@@ -55,7 +53,7 @@ export class TenantService {
 
       // Join the hashed result and the salt together
       const result = salt + '.' + hash.toString('hex');
-      
+
       const tenantData = response.data;
 
       const tenant = this.tenantRepository.create({
@@ -66,6 +64,8 @@ export class TenantService {
         createdAt: new Date(tenantData.createdAt),
         lastUsedAt: null,
         articles: [],
+        comments: [],
+        image: ""
       });
 
       return this.tenantRepository.save(tenant);
@@ -77,7 +77,7 @@ export class TenantService {
     }
   }
 
-  findOne(tenantId: string): Promise<Tenant> | null{
+  findOne(tenantId: string): Promise<Tenant> | null {
     if (!tenantId) {
       return null;
     }
@@ -94,5 +94,15 @@ export class TenantService {
       relations: ['articles'],
     });
     return tenant ? tenant.articles : []; // Ensure an empty array if no articles are found
+  }
+
+  async findTenantByApiKey(apiKey: string): Promise<Tenant> | null {
+    if (!apiKey) {
+      return null;
+    }
+
+    return this.tenantRepository.findOne({
+      where: { apiKey },
+    });
   }
 }

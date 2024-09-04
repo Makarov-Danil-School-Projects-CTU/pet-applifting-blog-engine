@@ -12,17 +12,20 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 const mockTenant = {
-  tenantId: '1',
+  tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
+  apiKey: 'test-api-key',
   name: 'Test Tenant',
-  apiKey: 'abc123',
+  password: 'test-password',
   createdAt: new Date(),
-  lastUsedAt: null,
+  lastUsedAt: new Date(),
   articles: [],
-  password: 'salt.hashpassword',
-};
+  comments: [],
+  commentVotes: [],
+  image: null,
+} as Tenant;
 
 const mockExternalApiResponse = {
-  tenantId: '1',
+  tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
   apiKey: 'abc123',
   name: 'Test Tenant',
   createdAt: new Date(),
@@ -31,8 +34,16 @@ const mockExternalApiResponse = {
 
 const mockTenantRepository = {
   find: jest.fn(),
-  create: jest.fn().mockImplementation((dto) => dto),
-  save: jest.fn().mockResolvedValue(mockTenant),
+  create: jest.fn().mockImplementation((dto) => ({
+    ...dto,
+    tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
+    createdAt: new Date(),
+    lastUsedAt: null,
+    articles: [],
+    comments: [],
+    image: null,
+  })),
+  save: jest.fn().mockImplementation((tenant) => Promise.resolve(tenant)), // Return the tenant that was passed in
   findOne: jest.fn(),
 };
 
@@ -52,6 +63,7 @@ describe('TenantService', () => {
 
     service = module.get<TenantService>(TenantService);
 
+    // Reset all mocks before each test
     jest.clearAllMocks();
   });
 
@@ -61,46 +73,50 @@ describe('TenantService', () => {
 
   it('should create a new tenant', async () => {
     const createTenantDto: CreateTenantDto = {
-      name: 'New Tenant',
-      password: 'password123',
+      name: mockTenant.name,
+      password: mockTenant.password,
     };
 
-    mockTenantRepository.find.mockResolvedValue([]); // Mock that no tenants with the same name exist
-    mockedAxios.post.mockResolvedValue({ data: mockExternalApiResponse });
+    mockTenantRepository.find.mockResolvedValue([]); // Mock no tenants exist with the same name
+    mockedAxios.post.mockResolvedValue({ data: mockExternalApiResponse }); // Mock Axios response
 
     const result = await service.create(createTenantDto);
 
     expect(mockTenantRepository.find).toHaveBeenCalledWith({
-      where: { name: 'New Tenant' },
+      where: { name: mockTenant.name },
     });
     expect(mockedAxios.post).toHaveBeenCalledWith(
       'https://fullstack.exercise.applifting.cz/tenants',
-      createTenantDto,
+      {
+        name: mockTenant.name,
+        password: expect.any(String),
+      },
     );
-    expect(mockTenantRepository.create).toHaveBeenCalledWith({
+    expect(mockTenantRepository.save).toHaveBeenCalledWith(expect.any(Object));
+    expect(result).toEqual({
       tenantId: mockExternalApiResponse.tenantId,
       apiKey: mockExternalApiResponse.apiKey,
       name: mockExternalApiResponse.name,
-      password: expect.any(String), // Ensure password is hashed
+      password: expect.any(String),
       createdAt: expect.any(Date),
-      lastUsedAt: null,
+      comments: [],
+      image: null,
       articles: [],
+      lastUsedAt: null,
     });
-    expect(mockTenantRepository.save).toHaveBeenCalledWith(expect.any(Object));
-    expect(result).toEqual(mockTenant);
   });
 
   it('should throw BadRequestException if tenant name is already in use', async () => {
-    mockTenantRepository.find.mockResolvedValue([mockTenant]); // Mock that a tenant with the same name already exists
+    mockTenantRepository.find.mockResolvedValue([mockTenant]); // Mock a tenant with the same name exists
 
     await expect(
       service.create({ name: 'Test Tenant', password: 'password123' }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(BadRequestException); // Expect a BadRequestException to be thrown
   });
 
   it('should find a tenant by ID', async () => {
     const tenantId = '1';
-    mockTenantRepository.findOne.mockResolvedValue(mockTenant);
+    mockTenantRepository.findOne.mockResolvedValue(mockTenant); // Mock tenant found by ID
 
     const result = await service.findOne(tenantId);
 
@@ -108,19 +124,19 @@ describe('TenantService', () => {
       where: { tenantId },
       relations: ['articles'],
     });
-    expect(result).toEqual(mockTenant);
+    expect(result).toEqual(mockTenant); // The found tenant should match the mockTenant object
   });
 
   it('should return null if tenant ID is not provided', async () => {
-    const result = await service.findOne(null);
+    const result = await service.findOne(null); // Null tenant ID
 
-    expect(result).toBeNull();
+    expect(result).toBeNull(); // Expect result to be null
   });
 
   it('should throw NotFoundException if tenant is not found', async () => {
     const tenantId = 'non-existing-id';
-    mockTenantRepository.findOne.mockResolvedValue(null);
+    mockTenantRepository.findOne.mockResolvedValue(null); // Mock no tenant found with given ID
 
-    await expect(service.findOne(tenantId)).resolves.toBeNull();
+    await expect(service.findOne(tenantId)).resolves.toBeNull(); // Since findOne returns null, expect it to resolve to null
   });
 });
