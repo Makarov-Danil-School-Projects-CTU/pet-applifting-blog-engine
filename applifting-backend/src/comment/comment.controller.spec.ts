@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
+import { Tenant } from '../entities/tenant.entity';
 
 const mockComment = {
   commentId: '1',
@@ -20,6 +21,19 @@ const mockPagination = {
   totalPages: 1,
   currentPage: 1,
 };
+
+const mockTenant = {
+  tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
+  apiKey: 'test-api-key',
+  name: 'Test Tenant',
+  password: 'test-password',
+  createdAt: new Date(),
+  lastUsedAt: new Date(),
+  articles: [],
+  comments: [],
+  commentVotes: [],
+  image: null,
+} as Tenant;
 
 const mockCommentService = {
   getCommentsForArticle: jest.fn().mockResolvedValue({
@@ -74,12 +88,14 @@ describe('CommentController', () => {
       articleId,
       page,
       limit,
+      mockTenant,
     );
 
     expect(service.getCommentsForArticle).toHaveBeenCalledWith(
       articleId,
       page,
       limit,
+      mockTenant.tenantId,
     );
     expect(result).toEqual({
       pagination: mockPagination,
@@ -88,42 +104,48 @@ describe('CommentController', () => {
   });
 
   it('should throw an error if article ID is not provided when getting comments', async () => {
-    await expect(controller.getCommentsForArticle('', 1, 10)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      controller.getCommentsForArticle('', 1, 10, mockTenant),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('should get a comment by ID', async () => {
     const commentId = '1';
 
-    const result = await controller.getCommentById(commentId);
+    const result = await controller.getCommentById(commentId, mockTenant);
 
-    expect(service.getCommentById).toHaveBeenCalledWith(commentId);
+    expect(service.getCommentById).toHaveBeenCalledWith(
+      commentId,
+      mockTenant.tenantId,
+    );
     expect(result).toEqual(mockComment);
   });
 
   it('should throw an error if comment is not found', async () => {
     const commentId = 'non-existing-id';
 
-    await expect(controller.getCommentById(commentId)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      controller.getCommentById(commentId, mockTenant),
+    ).rejects.toThrow(NotFoundException);
   });
-  
+
   it('should delete a comment', async () => {
     const commentId = '1';
 
-    const result = await controller.deleteComment(commentId);
+    const result = await controller.deleteComment(commentId, mockTenant);
 
-    expect(service.deleteComment).toHaveBeenCalledWith(commentId);
+    expect(service.deleteComment).toHaveBeenCalledWith(
+      commentId,
+      mockTenant.tenantId,
+    );
     expect(result).toEqual(mockComment);
   });
 
   it('should throw an error if trying to delete a non-existing comment', async () => {
     const commentId = 'non-existing-id';
 
-    await expect(controller.deleteComment(commentId)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(
+      controller.deleteComment(commentId, mockTenant),
+    ).rejects.toThrow(NotFoundException);
   });
 });

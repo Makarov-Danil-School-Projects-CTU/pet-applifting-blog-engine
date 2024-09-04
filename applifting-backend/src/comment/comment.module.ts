@@ -8,20 +8,26 @@ import { AccessTokenMiddleware } from '../middlewares/access-token.middleware';
 import { ApiKeyMiddleware } from '../middlewares/api-key.middleware';
 import { CommentController } from './comment.controller';
 // import { CommentsGateway } from './comment.gateway';
-import { CommentService } from './comment.service';
+import { CurrentTenantMiddleware } from '../middlewares/current-tenant.middleware';
+import { TenantService } from '../tenant/tenant.service';
+import { Tenant } from '../entities/tenant.entity';
 import { CommentResolver } from '../graphql/resolvers/comment.resolver';
+import { CommentService } from './comment.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comment, CommentVote, Article])],
-  providers: [CommentService, 
+  imports: [TypeOrmModule.forFeature([Comment, CommentVote, Article, Tenant])],
+  providers: [
+    CommentService,
     // CommentsGateway,
-     CommentResolver],
+    CommentResolver,
+    TenantService,
+  ],
   controllers: [CommentController],
 })
 export class CommentModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(ApiKeyMiddleware, AccessTokenMiddleware)
+      .apply(ApiKeyMiddleware, AccessTokenMiddleware, CurrentTenantMiddleware)
       .forRoutes(CommentController);
   }
 }
