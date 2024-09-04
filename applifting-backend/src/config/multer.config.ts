@@ -14,4 +14,17 @@ export const multerConfig = {
   limits: {
     fileSize: 5 * 1024 * 1024, // 5 MB file limit
   },
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedMimeTypes.includes(file.mimetype)) {
+      cb(null, true); // Accept the file
+    } else {
+      cb(
+        new Error(
+          'Invalid file type. Only JPEG, PNG, and GIF files are allowed.',
+        ),
+        false,
+      );
+    }
+  },
 };
