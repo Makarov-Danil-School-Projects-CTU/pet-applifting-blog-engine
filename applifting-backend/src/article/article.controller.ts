@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -16,8 +17,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
-import { Serialize } from '../interceptors/serialize.interceptor';
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
 import { Article } from '../entities/article.entity';
+import { Tenant } from '../entities/tenant.entity';
+import { Serialize } from '../interceptors/serialize.interceptor';
 import { ArticleService } from './article.service';
 import { ArticleResponseDto } from './dtos/article-response.dto';
 import { CreateArticleDto } from './dtos/create-article.dto';
@@ -38,8 +41,8 @@ export class ArticleController {
     description: 'List of all articles',
     type: [Article],
   })
-  getAllArticles(): Promise<Article[]> {
-    return this.articleService.getAllArticles();
+  getAllArticles(@CurrentTenant() tenant: Tenant): Promise<Article[]> {
+    return this.articleService.getAllArticles(tenant.tenantId);
   }
 
   @Get(':articleId')
@@ -55,10 +58,12 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 404, description: 'Article not found.' })
-  getArticleById(@Param('articleId') articleId: string): Promise<Article> {
-    return this.articleService.getArticleById(articleId);
+  getArticleById(
+    @Param('articleId') articleId: string,
+    @CurrentTenant() tenant: Tenant,
+  ): Promise<Article> {
+    return this.articleService.getArticleById(articleId, tenant.tenantId);
   }
-
   @Post()
   @ApiOperation({ summary: 'Create a new article' })
   @ApiBody({
@@ -71,8 +76,11 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 400, description: 'Invalid input data.' })
-  createArticle(@Body() createArticleDto: CreateArticleDto): Promise<Article> {
-    return this.articleService.createArticle(createArticleDto);
+  createArticle(
+    @Body() createArticleDto: CreateArticleDto,
+    @CurrentTenant() tenant: Tenant,
+  ): Promise<Article> {
+    return this.articleService.createArticle(createArticleDto, tenant.tenantId);
   }
 
   @Patch(':articleId')
@@ -96,8 +104,13 @@ export class ArticleController {
   updateArticle(
     @Param('articleId') articleId: string,
     @Body() updateArticleDto: UpdateArticleDto,
+    @CurrentTenant() tenant: Tenant,
   ): Promise<Article> {
-    return this.articleService.updateArticle(articleId, updateArticleDto);
+    return this.articleService.updateArticle(
+      articleId,
+      updateArticleDto,
+      tenant.tenantId,
+    );
   }
 
   @Delete(':articleId')
@@ -113,7 +126,10 @@ export class ArticleController {
     type: Article,
   })
   @ApiResponse({ status: 404, description: 'Article not found.' })
-  deleteArticle(@Param('articleId') articleId: string): Promise<Article> {
-    return this.articleService.deleteArticle(articleId);
+  deleteArticle(
+    @Param('articleId') articleId: string,
+    @CurrentTenant() tenant: Tenant,
+  ): Promise<Article> {
+    return this.articleService.deleteArticle(articleId, tenant.tenantId);
   }
 }

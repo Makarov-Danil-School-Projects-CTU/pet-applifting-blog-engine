@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateArticleDto {
   @ApiProperty({
@@ -8,6 +8,7 @@ export class CreateArticleDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Length(1, 100)
   title: string;
 
   @ApiProperty({
@@ -16,6 +17,7 @@ export class CreateArticleDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Length(1, 250)
   perex: string;
 
   @ApiProperty({
@@ -24,13 +26,6 @@ export class CreateArticleDto {
   })
   @IsString()
   @IsNotEmpty()
+  @Length(1)
   content: string;
-
-  @ApiProperty({
-    description: 'The ID of the tenant associated with the article',
-    example: 'ae5c7e79-cd6c-4486-b351-2911819fca33',
-  })
-  @IsUUID()
-  @IsOptional()
-  tenantId: string;
 }

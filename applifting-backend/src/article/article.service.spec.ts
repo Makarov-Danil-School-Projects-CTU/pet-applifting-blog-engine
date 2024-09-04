@@ -8,11 +8,16 @@ import { ArticleService } from './article.service';
 
 const mockTenant = {
   tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
-  name: 'Test Tenant',
   apiKey: 'test-api-key',
+  name: 'Test Tenant',
+  password: 'test-password',
   createdAt: new Date(),
   lastUsedAt: new Date(),
-};
+  articles: [],
+  comments: [],
+  commentVotes: [],
+  image: null,
+} as Tenant;
 
 const mockArticle = {
   articleId: 'e8d5f237-b99d-481f-a7a2-727550c7c6b4',
@@ -67,7 +72,7 @@ describe('ArticleService', () => {
     tenantRepository = module.get<Repository<Tenant>>(
       getRepositoryToken(Tenant),
     );
-    
+
     jest.clearAllMocks();
   });
 
@@ -85,12 +90,13 @@ describe('ArticleService', () => {
       tenantId: '99a0de2e-6efb-4f16-9604-812e2dd6e1aa',
     };
 
-    const result = await service.createArticle(createArticleDto);
+    const result = await service.createArticle(
+      createArticleDto,
+      mockTenant.tenantId,
+    );
 
     expect(articleRepository.create).toHaveBeenCalledWith({
-      title: createArticleDto.title,
-      perex: createArticleDto.perex,
-      content: createArticleDto.content,
+      ...createArticleDto,
       tenant: mockTenant, // Here, the tenant is already fetched and set
       comments: [],
     });
@@ -100,23 +106,24 @@ describe('ArticleService', () => {
     expect(result.content).toEqual(createArticleDto.content);
     expect(result.tenant.tenantId).toEqual(createArticleDto.tenantId);
   });
-  
+
   it('should return all articles', async () => {
-    const result = await service.getAllArticles();
-    
+    const result = await service.getAllArticles(mockTenant.tenantId);
+
     expect(articleRepository.find).toHaveBeenCalledWith({
-      relations: ['tenant', 'comments', 'comments.article'],
+      where: { tenant: { tenantId: mockTenant.tenantId } },
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
     expect(result).toEqual([mockArticle]);
   });
 
   it('should get an article by ID', async () => {
     const articleId = 'e8d5f237-b99d-481f-a7a2-727550c7c6b4';
-    const result = await service.getArticleById(articleId);
-    
+    const result = await service.getArticleById(articleId, mockTenant.tenantId);
+
     expect(articleRepository.findOne).toHaveBeenCalledWith({
-      where: { articleId },
-      relations: ['tenant', 'comments', 'comments.article'],
+      where: { articleId, tenant: { tenantId: mockTenant.tenantId } },
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
     expect(result).toEqual(mockArticle);
   });
@@ -124,28 +131,34 @@ describe('ArticleService', () => {
   it('should update an article', async () => {
     const updateArticleDto = { title: 'Updated Title' };
     const articleId = 'e8d5f237-b99d-481f-a7a2-727550c7c6b4';
-  
-    const result = await service.updateArticle(articleId, updateArticleDto);
-    
-    expect(articleRepository.update).toHaveBeenCalledWith({ articleId }, updateArticleDto);
+
+    const result = await service.updateArticle(
+      articleId,
+      updateArticleDto,
+      mockTenant.tenantId,
+    );
+
+    expect(articleRepository.update).toHaveBeenCalledWith(
+      { articleId },
+      updateArticleDto,
+    );
     expect(articleRepository.findOne).toHaveBeenCalledWith({
-      where: { articleId },
-      relations: ['tenant', 'comments', 'comments.article'],
+      where: { articleId, tenant: { tenantId: mockTenant.tenantId } },
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
     expect(result).toEqual(mockArticle);
   });
 
   it('should delete an article', async () => {
     const articleId = 'e8d5f237-b99d-481f-a7a2-727550c7c6b4';
-  
-    const result = await service.deleteArticle(articleId);
-    
+
+    const result = await service.deleteArticle(articleId, mockTenant.tenantId);
+
     expect(articleRepository.findOne).toHaveBeenCalledWith({
-      where: { articleId },
-      relations: ['tenant', 'comments', 'comments.article'],
+      where: { articleId, tenant: { tenantId: mockTenant.tenantId } },
+      relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
     expect(articleRepository.delete).toHaveBeenCalledWith({ articleId });
     expect(result).toEqual(mockArticle);
   });
 });
-

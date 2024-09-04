@@ -8,16 +8,18 @@ import { AccessTokenMiddleware } from '../middlewares/access-token.middleware';
 import { ApiKeyMiddleware } from '../middlewares/api-key.middleware';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
+import { CurrentTenantMiddleware } from '../middlewares/current-tenant.middleware';
+import { TenantService } from '../tenant/tenant.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Article, Tenant])],
+  providers: [ArticleService, ArticleResolver, TenantService],
   controllers: [ArticleController],
-  providers: [ArticleService, ArticleResolver],
 })
 export class ArticleModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(ApiKeyMiddleware, AccessTokenMiddleware)
+      .apply(ApiKeyMiddleware, AccessTokenMiddleware, CurrentTenantMiddleware)
       .forRoutes(ArticleController);
   }
 }

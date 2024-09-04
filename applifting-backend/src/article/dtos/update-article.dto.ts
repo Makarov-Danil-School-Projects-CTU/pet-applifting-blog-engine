@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString, Length } from 'class-validator';
 
 export class UpdateArticleDto {
   @ApiProperty({
@@ -7,6 +7,7 @@ export class UpdateArticleDto {
     example: 'Some new title',
   })
   @IsString()
+  @Length(1, 100)
   @IsOptional()
   title?: string;
 
@@ -15,6 +16,7 @@ export class UpdateArticleDto {
     example: 'Just a perex',
   })
   @IsString()
+  @Length(1, 250)
   @IsOptional()
   perex?: string;
 
@@ -24,10 +26,6 @@ export class UpdateArticleDto {
   })
   @IsString()
   @IsOptional()
+  @Length(1)
   content?: string;
-
-  @ApiPropertyOptional({ description: 'The author of the article', example: "John Wick" })
-  @IsString()
-  @IsOptional()
-  author?: string;
 }

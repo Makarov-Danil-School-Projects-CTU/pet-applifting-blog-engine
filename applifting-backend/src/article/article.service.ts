@@ -17,8 +17,7 @@ export class ArticleService {
     private tenantRepository: Repository<Tenant>,
   ) {}
 
-  async createArticle(createArticleDto: CreateArticleDto): Promise<Article> {
-    const { tenantId, ...articleData } = createArticleDto;
+  async createArticle(createArticleDto: CreateArticleDto, tenantId: string): Promise<Article> {
     const tenant = await this.tenantRepository.findOne({ where: { tenantId } });
 
     if (!tenant) {
@@ -26,7 +25,7 @@ export class ArticleService {
     }
 
     const article = this.articleRepository.create({
-      ...articleData,
+      ...createArticleDto,
       tenant,
       comments: [],
     });
@@ -34,15 +33,16 @@ export class ArticleService {
     return await this.articleRepository.save(article);
   }
 
-  async getAllArticles(): Promise<Article[]> {
+  async getAllArticles(tenantId: string): Promise<Article[]> {
     return await this.articleRepository.find({
+      where: { tenant: { tenantId } },
       relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
   }
 
-  async getArticleById(articleId: string): Promise<Article> {
+  async getArticleById(articleId: string, tenantId: string): Promise<Article> {
     return await this.articleRepository.findOne({
-      where: { articleId },
+      where: { articleId, tenant: { tenantId } },
       relations: ['tenant', 'comments', 'comments.article', 'image'],
     });
   }
@@ -50,13 +50,14 @@ export class ArticleService {
   async updateArticle(
     articleId: string,
     updateArticleDto: UpdateArticleDto,
+    tenantId: string,
   ): Promise<Article> {
     await this.articleRepository.update({ articleId }, updateArticleDto);
-    return this.getArticleById(articleId);
+    return this.getArticleById(articleId, tenantId);
   }
 
-  async deleteArticle(articleId: string): Promise<Article> {
-    const article = await this.getArticleById(articleId);
+  async deleteArticle(articleId: string, tenantId: string): Promise<Article> {
+    const article = await this.getArticleById(articleId, tenantId);
     if (!article) {
       throw new NotFoundException('Article was not found');
     }
