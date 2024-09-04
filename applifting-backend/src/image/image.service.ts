@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 
 import { Article } from '../entities/article.entity';
 import { Image } from '../entities/image.entity';
+import { Tenant } from '../entities/tenant.entity';
 import { CreateImageDto } from './dtos/create-image.dto';
 
 @Injectable()
@@ -17,9 +18,15 @@ export class ImageService {
 
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
+
+    @InjectRepository(Tenant)
+    private readonly tenantRepository: Repository<Tenant>,
   ) {}
 
-  async getImageById(imageId: string): Promise<{
+  async getImageById(
+    imageId: string,
+    tenantId: string,
+  ): Promise<{
     file: ReadStream;
     mimeType: string;
     filename: string;
@@ -28,8 +35,11 @@ export class ImageService {
     try {
       // Find image metadata in the database
       const image = await this.imageRepository.findOne({
-        where: { imageId },
-        relations: ['article'],
+        where: {
+          imageId,
+          tenant: { tenantId },
+        },
+        relations: ['tenant'],
       });
 
       if (!image) {
@@ -67,66 +77,94 @@ export class ImageService {
   async uploadImage(
     imageDto: CreateImageDto,
     file: Express.Multer.File,
+    tenantId: string,
   ): Promise<Image> {
     const { articleId } = imageDto;
 
     const article = await this.articleRepository.findOne({
-      where: { articleId },
-      relations: ['image'],
+      where: {
+        articleId,
+        tenant: { tenantId },
+      },
+      relations: ['tenant', 'image'], // Include the 'image' relation to check existing image
     });
 
     if (!article) {
       throw new NotFoundException(`Article with ID ${articleId} not found`);
     }
 
+    const tenant = await this.tenantRepository.findOneBy({ tenantId });
+
+    if (!tenant) {
+      throw new NotFoundException('Tenant was not found');
+    }
+
+    // Handle existing image if present
+    await this.handleExistingImage(article.image);
+
+    // Ensure upload directory exists
     const uploadDir = join(__dirname, '../../uploads');
+    await this.ensureDirectoryExists(uploadDir);
+
     const filePath = join(uploadDir, file.originalname);
 
-    // Check if the article already has an image and delete it
-    if (article.image) {
-      const oldImagePath = join(uploadDir, article.image.name);
-
-      try {
-        // Remove old image from filesystem if it exists
-        await fs.unlink(oldImagePath);
-      } catch (err) {
-        if (err.code !== 'ENOENT') {
-          // Ignore error if the file does not exist
-          throw err;
-        }
-      }
-
-      await this.imageRepository.delete({ imageId: article.image.imageId });
-    }
-
     // Store the new file on disk
+    await this.storeFileOnDisk(filePath, file.buffer);
 
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-    } catch (err) {
-      throw new Error(`Failed to create upload directory: ${err.message}`);
-    }
-
-    try {
-      await fs.writeFile(filePath, file.buffer);
-    } catch (err) {
-      throw new Error(`Failed to write file: ${err.message}`);
-    }
-
-    // Create a new image record
+    // Create and save the new image record
     const image = this.imageRepository.create({
       name: file.originalname,
       mimeType: file.mimetype,
       url: `http://localhost:4000/uploads/${file.originalname}`, // Adjust URL to match your server setup
       article,
+      tenant,
     });
 
     return this.imageRepository.save(image);
   }
 
-  async deleteImage(imageId: string): Promise<Image> {
+  private async handleExistingImage(image: Image | undefined) {
+    if (!image) return;
+
+    const oldImagePath = join(__dirname, '../../uploads', image.name);
+
     try {
-      const image = await this.imageRepository.findOne({ where: { imageId } });
+      await fs.unlink(oldImagePath);
+    } catch (err) {
+      if (err.code !== 'ENOENT') {
+        // Ignore error if the file does not exist
+        throw new Error(`Failed to delete old image: ${err.message}`);
+      }
+    }
+
+    await this.imageRepository.delete({ imageId: image.imageId });
+  }
+
+  private async ensureDirectoryExists(directoryPath: string) {
+    try {
+      await fs.mkdir(directoryPath, { recursive: true });
+    } catch (err) {
+      throw new Error(`Failed to create upload directory: ${err.message}`);
+    }
+  }
+
+  private async storeFileOnDisk(filePath: string, buffer: Buffer) {
+    try {
+      await fs.writeFile(filePath, buffer);
+    } catch (err) {
+      throw new Error(`Failed to write file: ${err.message}`);
+    }
+  }
+
+  async deleteImage(imageId: string, tenantId: string): Promise<Image> {
+    try {
+      const image = await this.imageRepository.findOne({
+        where: {
+          imageId,
+          tenant: { tenantId },
+        },
+        relations: ['tenant'],
+      });
 
       if (!image) {
         throw new NotFoundException('Image was not found');

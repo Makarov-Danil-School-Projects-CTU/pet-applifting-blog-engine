@@ -3,6 +3,7 @@ import { createReadStream } from 'fs';
 
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
+import { Tenant } from '../entities/tenant.entity';
 
 const mockImage = {
   imageId: '1',
@@ -18,6 +19,19 @@ const mockFile = {
   buffer: Buffer.from('test'),
   size: 1024,
 } as Express.Multer.File;
+
+const mockTenant = {
+  tenantId: '1',
+  name: 'Test Tenant',
+  apiKey: 'abc123',
+  createdAt: new Date(),
+  lastUsedAt: null,
+  articles: [],
+  password: 'salt.hashpassword',
+  comments: [], 
+  commentVotes: [], 
+  image: null
+};
 
 const mockImageService = {
   uploadImage: jest.fn().mockResolvedValue(mockImage),
@@ -58,7 +72,7 @@ describe('ImageController', () => {
   it('should upload an image', async () => {
     const articleId = '99a0de2e-6efb-4f16-9604-812e2dd6e1aa';
 
-    const result = await controller.uploadImage(articleId, mockFile);
+    const result = await controller.uploadImage(articleId, mockFile, mockTenant);
 
     expect(service.uploadImage).toHaveBeenCalledWith(
       {
@@ -67,6 +81,7 @@ describe('ImageController', () => {
         mimeType: mockFile.mimetype,
       },
       mockFile,
+      mockTenant.tenantId
     );
     expect(result).toEqual(mockImage);
   });

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -20,7 +21,9 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 
+import { CurrentTenant } from '../decorators/current-tenant.decorator';
 import { Image } from '../entities/image.entity';
+import { Tenant } from '../entities/tenant.entity';
 import { Serialize } from '../interceptors/serialize.interceptor';
 import { CreateImageDto } from './dtos/create-image.dto';
 import { ImageResponseDto } from './dtos/image-response.dto';
@@ -36,7 +39,10 @@ export class ImageController {
 
   @Post(':articleId')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload an image for a specific article' })
+  @ApiOperation({
+    summary:
+      'Upload an image for a specific article (JPEG, PNG, and GIF max 5MB)',
+  })
   @ApiParam({
     name: 'articleId',
     type: String,
@@ -70,14 +76,37 @@ export class ImageController {
   async uploadImage(
     @Param('articleId') articleId: string,
     @UploadedFile() file: Express.Multer.File,
+    @CurrentTenant() tenant: Tenant,
   ): Promise<Image> {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+    // Check if file is provided
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    // Validate MIME type
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException(
+        'Invalid file type. Only JPEG, PNG, and GIF are allowed.',
+      );
+    }
+
+    // Validate file size
+    if (file.size > maxFileSize) {
+      throw new BadRequestException(
+        'File size exceeds the maximum limit of 5MB.',
+      );
+    }
+
     const uploadInput = {
       articleId,
       name: file.originalname,
       mimeType: file.mimetype,
     } as CreateImageDto;
 
-    return this.imageService.uploadImage(uploadInput, file);
+    return this.imageService.uploadImage(uploadInput, file, tenant.tenantId);
   }
 
   @Get(':imageId')
@@ -100,9 +129,10 @@ export class ImageController {
   async downloadImage(
     @Param('imageId') imageId: string,
     @Res() res: Response,
+    @CurrentTenant() tenant: Tenant,
   ): Promise<void> {
     const { file, mimeType, filename, size } =
-      await this.imageService.getImageById(imageId);
+      await this.imageService.getImageById(imageId, tenant.tenantId);
 
     // Set the correct headers for content type and content disposition
     res.setHeader('Content-Type', mimeType);
@@ -125,7 +155,10 @@ export class ImageController {
     type: Image,
   })
   @ApiResponse({ status: 404, description: 'Image not found.' })
-  async deleteImage(@Param('imageId') imageId: string): Promise<Image> {
-    return this.imageService.deleteImage(imageId);
+  async deleteImage(
+    @Param('imageId') imageId: string,
+    @CurrentTenant() tenant: Tenant,
+  ): Promise<Image> {
+    return this.imageService.deleteImage(imageId, tenant.tenantId);
   }
 }
