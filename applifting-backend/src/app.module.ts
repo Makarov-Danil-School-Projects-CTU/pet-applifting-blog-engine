@@ -1,6 +1,6 @@
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -13,6 +13,7 @@ import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
 import { ImageModule } from './image/image.module';
 import { TenantModule } from './tenant/tenant.module';
+import { CurrentTenantMiddleware } from './middlewares/current-tenant.middleware';
 
 @Module({
   imports: [
@@ -23,14 +24,23 @@ import { TenantModule } from './tenant/tenant.module';
     // TypeOrmModule.forRoot(typeOrmConfig),
     TypeOrmModule.forRootAsync({
       useFactory: async () => {
-        return AppDataSource.options;  // Return the options from your DataSource
+        return AppDataSource.options; // Return the options from your DataSource
       },
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       playground: false,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      context: ({ req }) => ({ req }),
+      context: ({ req, connection }) => {
+        // For subscriptions
+        if (connection) {
+          return {
+            req: connection.context,
+          };
+        }
+        // For queries and mutations
+        return { req };
+      },
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql/graphql.ts'),
@@ -59,4 +69,8 @@ import { TenantModule } from './tenant/tenant.module';
     // },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CurrentTenantMiddleware).forRoutes('/graphql'); // Apply middleware only to the /graphql route
+  }
+}
