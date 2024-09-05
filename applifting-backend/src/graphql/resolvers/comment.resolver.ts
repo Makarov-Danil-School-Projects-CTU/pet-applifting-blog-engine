@@ -65,7 +65,7 @@ export class CommentResolver {
     const updatedComment = await this.commentService.voteOnComment(
       input,
       ipAddress,
-      tenant.tenantId
+      tenant.tenantId,
     );
 
     // Publish to GraphQL subscription after voting on a comment

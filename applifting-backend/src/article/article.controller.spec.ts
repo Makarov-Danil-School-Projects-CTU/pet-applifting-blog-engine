@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CurrentTenantMiddleware } from '../middlewares/current-tenant.middleware';
 import { Article } from '../entities/article.entity';
+import { Tenant } from '../entities/tenant.entity';
 import { ArticleController } from './article.controller';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dtos/create-article.dto';
 import { UpdateArticleDto } from './dtos/update-article.dto';
-import { Tenant } from '../entities/tenant.entity';
 
 const mockTenant: Tenant = {
   tenantId: 'mock-tenant-id',
@@ -18,7 +17,7 @@ const mockTenant: Tenant = {
   articles: [],
   image: null,
   comments: [],
-  commentVotes: []
+  commentVotes: [],
 };
 
 // Mock Data and Setup

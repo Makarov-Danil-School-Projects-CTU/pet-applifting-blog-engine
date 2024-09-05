@@ -17,7 +17,10 @@ export class ArticleService {
     private tenantRepository: Repository<Tenant>,
   ) {}
 
-  async createArticle(createArticleDto: CreateArticleDto, tenantId: string): Promise<Article> {
+  async createArticle(
+    createArticleDto: CreateArticleDto,
+    tenantId: string,
+  ): Promise<Article> {
     const tenant = await this.tenantRepository.findOne({ where: { tenantId } });
 
     if (!tenant) {

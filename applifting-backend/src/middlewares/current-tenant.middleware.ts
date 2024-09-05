@@ -1,7 +1,6 @@
-import { ExecutionContext, Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 
-import { GqlExecutionContext } from '@nestjs/graphql';
 import { Tenant } from '../entities/tenant.entity';
 import { TenantService } from '../tenant/tenant.service';
 

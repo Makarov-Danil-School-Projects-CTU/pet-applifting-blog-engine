@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Tenant } from '../entities/tenant.entity';
+import { TenantResolver } from '../graphql/resolvers/tenant.resolver';
 import { TenantController } from './tenant.controller';
 import { TenantService } from './tenant.service';
-import { TenantResolver } from '../graphql/resolvers/tenant.resolver';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Tenant])],

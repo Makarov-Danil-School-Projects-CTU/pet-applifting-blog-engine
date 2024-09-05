@@ -1,8 +1,8 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { NotFoundException } from '@nestjs/common';
 import { Article } from '../entities/article.entity';
 import { CommentVote } from '../entities/comment-vote.entity';
 import { Comment } from '../entities/comment.entity';

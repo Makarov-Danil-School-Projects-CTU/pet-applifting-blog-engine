@@ -3,7 +3,6 @@ import { createReadStream } from 'fs';
 
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
-import { Tenant } from '../entities/tenant.entity';
 
 const mockImage = {
   imageId: '1',

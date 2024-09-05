@@ -1,9 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { Tenant } from '../entities/tenant.entity';
 import { CommentController } from './comment.controller';
 import { CommentService } from './comment.service';
-import { Tenant } from '../entities/tenant.entity';
 
 const mockComment = {
   commentId: '1',

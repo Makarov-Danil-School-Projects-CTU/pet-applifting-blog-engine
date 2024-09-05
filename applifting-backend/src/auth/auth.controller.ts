@@ -1,16 +1,15 @@
 import { Body, Controller, Post, Req } from '@nestjs/common';
-
-import { AuthService } from './auth.service';
-import { LoginUserDto } from './dtos/login-user.dto';
 import {
   ApiBody,
-  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
+
+import { AuthService } from './auth.service';
 import { LoginResponseDto } from './dtos/login-response.dto';
+import { LoginUserDto } from './dtos/login-user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -30,7 +29,7 @@ export class AuthController {
   async login(
     @Body() body: LoginUserDto,
     // @Headers('X-API-KEY') apiKey: string
-    @Req() req: Request
+    @Req() req: Request,
   ): Promise<LoginResponseDto> {
     const apiKey = req.headers['x-api-key'] as string;
     return this.authService.login(body, apiKey);

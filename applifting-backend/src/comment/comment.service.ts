@@ -52,7 +52,7 @@ export class CommentService {
       content,
       article,
       votes: [],
-      tenant
+      tenant,
     });
 
     return this.commentRepository.save(comment);
@@ -98,7 +98,9 @@ export class CommentService {
     } else {
       // If there is no existing vote, create a new vote
       // TO-DO add tenant
-      const tenant = await this.tenantRepository.findOne({ where: { tenantId } });
+      const tenant = await this.tenantRepository.findOne({
+        where: { tenantId },
+      });
 
       if (!tenant) {
         throw new Error('Tenant not found');
@@ -108,7 +110,7 @@ export class CommentService {
         ipAddress,
         value: voteDto.vote === 'UP' ? 1 : -1,
         comment,
-        tenant
+        tenant,
       });
 
       await this.commentVoteRepository.save(vote);

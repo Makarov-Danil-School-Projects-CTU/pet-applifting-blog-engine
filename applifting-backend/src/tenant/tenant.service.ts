@@ -65,7 +65,7 @@ export class TenantService {
         lastUsedAt: null,
         articles: [],
         comments: [],
-        image: ""
+        image: '',
       });
 
       return this.tenantRepository.save(tenant);

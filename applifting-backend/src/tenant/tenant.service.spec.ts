@@ -2,11 +2,10 @@ import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import axios from 'axios';
-import { Repository } from 'typeorm';
-import { Tenant } from '../entities/tenant.entity';
-import { TenantService } from './tenant.service';
 
+import { Tenant } from '../entities/tenant.entity';
 import { CreateTenantDto } from './dtos/create-tenant.dto';
+import { TenantService } from './tenant.service';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;

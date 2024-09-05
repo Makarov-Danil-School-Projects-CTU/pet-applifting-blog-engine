@@ -55,7 +55,7 @@ describe('AuthService', () => {
     mockedAxios.post.mockRejectedValueOnce(new Error('Unauthorized'));
 
     await expect(
-      service.login(mockLoginUserDto, 'invalid_api_key')
+      service.login(mockLoginUserDto, 'invalid_api_key'),
     ).rejects.toThrow(HttpException);
   });
 });

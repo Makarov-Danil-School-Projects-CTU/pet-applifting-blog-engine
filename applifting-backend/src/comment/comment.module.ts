@@ -8,10 +8,10 @@ import { AccessTokenMiddleware } from '../middlewares/access-token.middleware';
 import { ApiKeyMiddleware } from '../middlewares/api-key.middleware';
 import { CommentController } from './comment.controller';
 // import { CommentsGateway } from './comment.gateway';
-import { CurrentTenantMiddleware } from '../middlewares/current-tenant.middleware';
-import { TenantService } from '../tenant/tenant.service';
 import { Tenant } from '../entities/tenant.entity';
 import { CommentResolver } from '../graphql/resolvers/comment.resolver';
+import { CurrentTenantMiddleware } from '../middlewares/current-tenant.middleware';
+import { TenantService } from '../tenant/tenant.service';
 import { CommentService } from './comment.service';
 
 @Module({

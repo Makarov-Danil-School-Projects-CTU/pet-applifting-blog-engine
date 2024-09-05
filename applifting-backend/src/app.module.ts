@@ -12,8 +12,8 @@ import { ArticleModule } from './article/article.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentModule } from './comment/comment.module';
 import { ImageModule } from './image/image.module';
-import { TenantModule } from './tenant/tenant.module';
 import { CurrentTenantMiddleware } from './middlewares/current-tenant.middleware';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
@@ -61,12 +61,12 @@ import { CurrentTenantMiddleware } from './middlewares/current-tenant.middleware
   providers: [
     // Comment if we work with graphql
     // this validation pipe does not pass graphql requests
-    // {
-    //   provide: APP_PIPE,
-    //   useValue: new ValidationPipe({
-    //     whitelist: true
-    //   }),
-    // },
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true
+      }),
+    },
   ],
 })
 export class AppModule {
