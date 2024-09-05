@@ -3,7 +3,7 @@
 This project is part of a test assignment for the company **Applifting**. The original task can be found [here](https://github.com/Applifting/fullstack-exercise/blob/master/assignment.md). The task is to implement a simple single-user blog engine in Node.js. The original assignment is intentionally broad, allowing for creativity and the opportunity to showcase technical skills. For this project, I defined the following objectives:
 
 1. **Implement authentication**
-2. **Define entities:** tenant, article, comment, image, and implement simple validation and CRUD operations for them.
+2. **Define entities:** tenant, article, comment, image. Implement simple validation and CRUD operations for them.
 3. **Add features for articles and comments:** Allow users to add comments to articles. Enable Reddit-style upvote and downvote functionality for comments. Votes should be unique and identified by IP address. Use GraphQL Subscriptions and WebSockets for adding comments and votes.
 4. **Implement multitenancy:** Our content (articles, comments, images) will be accessible only to us.
 5. **Architecture:** Design both REST API and GraphQL endpoints.
