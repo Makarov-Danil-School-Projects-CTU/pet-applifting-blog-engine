@@ -152,6 +152,7 @@ docker compose up -d --build
 ### 7. Implementing Unit and End-to-End (E2E) Tests
 
 **🌍 Multi-Environment Setup for Development and Testing**
+
 To facilitate smooth development and testing processes, I created two distinct environments: one for development and one for testing.
 - `npm run start:dev` to run dev environment,
 - `npm run test` to run unit tests
