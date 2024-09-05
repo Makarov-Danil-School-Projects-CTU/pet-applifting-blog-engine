@@ -61,12 +61,12 @@ import { TenantModule } from './tenant/tenant.module';
   providers: [
     // Comment if we work with graphql
     // this validation pipe does not pass graphql requests
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({
-        whitelist: true
-      }),
-    },
+    // {
+    //   provide: APP_PIPE,
+    //   useValue: new ValidationPipe({
+    //     whitelist: true
+    //   }),
+    // },
   ],
 })
 export class AppModule {
