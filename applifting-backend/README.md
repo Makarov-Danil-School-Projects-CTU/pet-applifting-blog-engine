@@ -52,6 +52,10 @@ If you want to use GraphQL, keep ValidationPipe commented in app.module.ts like 
 
 For the REST API you can uncomment these lines. The reason is that ValidationPipe wrongly cuts request body for GraphQL, but for REST API it's ok.
 
+### Test input data
+
+When we run a program, a migration also starts. It inserts 2 users with usernames "user1" and "user2". Both have "123123" password.
+
 ## 💡 Solution
 
 ### 1. **Authentication**
